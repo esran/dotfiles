@@ -1,0 +1,4 @@
+# vim: set filetype=zsh :
+14ip () {
+	VBoxManage guestproperty enumerate "ubuntu-14.04" | grep "Net.*V4.*IP" | sed -e 's/^.*value: \([^,]*\),.*$/\1/'
+}

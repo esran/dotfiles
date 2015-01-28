@@ -30,7 +30,7 @@ export DEFAULT_USER=sean
 [ -z "$HOSTNAME" ] && HOSTNAME=$(hostname)
 
 # Color TERM
-if [ "$COLORTERM" = "gnome-terminal" ]; then
+if [[ -z $COLORTERM -o "$COLORTERM" = "gnome-terminal" ]]; then
 	case $TERM in
 		xterm)
 			TERM=xterm-256color
@@ -49,3 +49,6 @@ export GITHUB_DOT_VIM_TOKEN="8763b2ceb045ae0c5698e9889fb02a4e32e91ed3"
 
 # Make options
 export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"
+
+# Ensure sensible umask
+umask 022

@@ -1,0 +1,8 @@
+
+# open the txt-diff files for all failed tests in one vim session
+function txt_diffs ()
+{
+	grep failed results/jo_ut_test_success.txt \
+		| awk '{ print "results/jo_ut_test" $3 "_results.txt-diff" }' \
+		| xargs gvim -o
+}

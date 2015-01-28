@@ -1,0 +1,12 @@
+fails () {
+	if [ ! -d results ]
+	then
+		echo "ERROR: no results directory found!"
+		return 1
+	fi
+
+	set -A _fails_list `awk '/failed/ { print $3 }' results/jo_ut_test_success.txt`
+	echo "failed tests: $_fails_list"
+}
+
+alias lf='echo "failed tests: $_fails_list"'

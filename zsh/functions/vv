@@ -1,0 +1,22 @@
+# vim: set filetype=zsh :
+vv () {
+	if [[ -n ${VIM_SERVER} ]]
+	then
+		_host=$VIM_SERVER
+	else
+		_tmux=$(tmux display-message -p '#I' 2> /dev/null)
+		if [[ -n $_tmux ]]
+		then
+			_host=VVIM$_tmux
+		else
+			_host=$HOSTNAME
+		fi
+	fi
+
+	if [ -z "$@" ]
+	then
+		command vim --servername $_host;
+	else
+		command vim --servername $_host --remote-tab-silent "$@" || command vim --servername $_host "$@";
+	fi
+}

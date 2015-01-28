@@ -1,0 +1,8 @@
+
+# open the xml-diff files for all failed tests in one vim session
+function xml_diffs ()
+{
+	grep failed results/jo_ut_test_success.txt \
+		| awk '{ print "results/jo_ut_test" $3 "_results.xml-diff" }' \
+		| xargs gvim -o
+}

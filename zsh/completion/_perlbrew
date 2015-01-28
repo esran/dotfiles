@@ -1,0 +1,82 @@
+#compdef perlbrew
+
+# dbbolton
+# https://github.com/dbb/zsh-stuff
+
+_perlbrew () {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments \
+        '1: :->command'\
+        '*: :->perl'
+
+    case $state in
+    command)
+        _arguments "1:commands:((init\:'Initialize perlbrew environment.' \
+            install\:'Install perl' \
+            uninstall\:'Uninstall the given installation' \
+            list\:'List installed perls' \
+            use\:'Use the specified perl in current shell' \
+            available\:'List perls available to install' \
+            switch\:'Permanently use the specified perl as default' \
+            mirror\:'Pick a preferred mirror site' \
+            off\:'Permanently turn off perlbrew, go back to system Perl' \
+            version\:'Display version' \
+            help\:'Read more detailed instructions'))"
+    ;;
+
+    *)
+        case $words[2] in
+            (init|list|available|off|version|help)
+                _message "'$words[2]' takes no arguments."
+            ;;
+
+            install)
+                # This list generation is a little slow.
+                _perlbrew_all_avail=( ${(f)"$( perlbrew available | perl -lpe \
+                    's/^i?\s+//' )"} )
+                compadd "$@" $_perlbrew_all_avail
+
+                # Uncomment for a message telling you what's installed
+                # _perlbrew_avail_installed=( ${(f)"$( perlbrew available | \
+                #     perl -lne 'print if s/^i\s+//' )"} )
+                # _message "Installed: $_perlbrew_avail_installed"
+            ;;
+
+            mirror)
+                _message 'mirror URL'
+            ;;
+
+            uninstall)
+                # Not too slow
+                if [[ -n $PERLBREW_ROOT ]]; then
+                    _perlbrew_local_perls=( $PERLBREW_ROOT/perls/*(:t) )
+                elif [[ -d $HOME/perl5/perls ]]; then
+                    _perlbrew_local_perls=( $HOME/perl5/perls/*(:t) )
+                else
+                    _message "No perls directory found."
+                    # _perlbrew_local_perls is undef
+                fi
+
+                compadd "$@" $_perlbrew_local_perls
+            ;;
+
+            (switch|use)
+                # Not too slow either
+                _perlbrew_list=( ${(f)"$( perlbrew list | perl -lpe \
+                    's/^(\*)?\s+//;s/\s*\([\d\.]+\)$//' )"} )
+                compadd "$@" $_perlbrew_list
+            ;;
+
+
+
+            *)
+                _message "Unknown argument: $words[2]"
+        esac
+    esac
+
+} ## end _perlbrew
+
+_perlbrew "$@"
+

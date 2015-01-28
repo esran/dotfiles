@@ -1,0 +1,18 @@
+# vim: set filetype=zsh :
+gv () {
+	if [[ -n ${GVIM_SERVER+1} ]]
+	then
+		_host=$GVIM_SERVER
+	else
+		case $HOSTNAME in
+		sean-PC)
+			_host=GVIM
+			;;
+		*)
+			_host=$HOSTNAME
+			;;
+		esac
+	fi
+
+	command gvim --servername $_host --remote-tab-silent "$@" || command gvim --servername $_host "$@";
+}

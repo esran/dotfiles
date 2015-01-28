@@ -2,9 +2,17 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
 
 # This gets loaded as the only startup file prior to the gnome-session
 
-# Path tweaks
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-PATH=/usr/lib/ccache:$PATH # Add ccache to front of path
+# Add RVM to PATH for scripting
+if [[ -d ~/.rvm/bin ]]
+then
+	PATH=$PATH:$HOME/.rvm/bin
+fi
+
+# Add ccache to front of path
+if [[ -d /usr/lib/ccache ]]
+then
+	PATH=/usr/lib/ccache:$PATH
+fi
 
 # Locally installed stuff
 PATH=$HOME/local/bin:$PATH
@@ -16,9 +24,9 @@ PATH=$HOME/bin:$PATH
 export PATH MANPATH
 
 # Justone variables and paths
-[ -f /etc/justone_profile ] && . /etc/justone_profile
+[[ -f /etc/justone_profile ]] && . /etc/justone_profile
 export PGTESTDIR=~/Test
-[ ! -d $PGTESTDIR ] && mkdir $PGTESTDIR
+[[ ! -d $PGTESTDIR ]] && mkdir $PGTESTDIR
 
 # Make
 export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"

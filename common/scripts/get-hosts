@@ -1,0 +1,3 @@
+:
+
+dig @oregon intranet. axfr | awk '/IN\tA\t/ { sub(".intranet.", "", $1); print $NF "\t" $1 }'

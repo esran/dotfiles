@@ -1,0 +1,4 @@
+# vim: set filetype=zsh :
+debip () {
+	VBoxManage guestproperty enumerate "Debian 6.0.6" | grep "Net.*V4.*IP" | sed -e 's/^.*value: \([^,]*\),.*$/\1/'
+}
