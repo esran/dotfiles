@@ -1,0 +1,77 @@
+echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_log
+
+# Runs second (after .zprofile) for each shell created in the gnome-session
+
+# Antigen
+if [ -f $HOME/.antigen/antigen.zsh ]; then
+	source "$HOME/.antigen/antigen.zsh"
+
+	antigen-use oh-my-zsh
+
+	# Used by some prompts :(
+	antigen-bundle virtualenv
+
+	antigen-bundle git
+	antigen-bundle svn
+	antigen-bundle mvn
+
+	antigen-bundle arialdomartini/oh-my-git
+	# antigen theme arialdomartini/oh-my-git-themes arialdo-granzestyle
+
+	case $TERM in
+		xterm*|screen*)
+			antigen-bundle zsh-users/zsh-syntax-highlighting
+			antigen theme agnoster
+			;;
+		vt100)
+			;;
+		*)
+			echo "unhandled term type: $TERM"
+			;;
+	esac
+
+	antigen-bundle zsh-users/zsh-history-substring-search
+
+	# Ruby
+	antigen-bundle ruby
+	antigen-bundle rvm
+
+	antigen-apply
+
+	# oh-my-zsh clobbers LESS :(
+	export LESS="-F -X -R"
+fi
+
+# History substring search
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+# Add any functions from my scripts/zsh folder
+if [ -d ~/scripts/zsh ]
+then
+	fpath+=~/scripts/zsh
+	for f in ~/scripts/zsh/*
+	do
+		[ -f $f ] && autoload $(basename $f)
+	done
+fi
+
+# PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+set path+=~/.rvm/bin
+
+# dircolors
+[ -f ~/Stuff/dircolors-solarized/dircolors.ansi-light ] && eval `dircolors ~/Stuff/dircolors-solarized/dircolors.ansi-light`
+
+# turn of nomatch so that stuff like -? and ^. works
+setopt nonomatch
+
+# Use dig script to get hosts for completion
+zstyle -e ':completion:*' hosts 'reply=($($HOME/scripts/get-hosts))'
+
+# Load aliases
+[ -f ~/.zsh_alias ] && . ~/.zsh_alias
+
+# Temporary add PosrtgresXL
+# export PATH=/opt/sean/PostgresXL/bin:$PATH
+# export LD_LIBRARY_PATH=/opt/sean/PostgresXL/lib:$LD_LIBRARY_PATH

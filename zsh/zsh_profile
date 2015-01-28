@@ -1,0 +1,51 @@
+echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
+
+# This should get picked up by .profile
+if [[ -z $JO_INST_JO ]]
+then
+	[ -f /etc/justone_profile ] && . /etc/justone_profile
+fi
+
+# Also handled in .profile but useful to have it here 
+if [[ -n $PGTESTDIR ]]
+then
+	PGTESTDIR=~/Test
+	[[ ! -d $PGTESTDIR ]] && mkdir $PGTESTDIR
+	export PGTESTDIR
+fi
+
+# Runs first for each shell created in the gnome-session
+
+# LC_COLLATE so that . files get sorted first
+# Actually, don't as this changes sort order in other places too
+# such as out test scripts!
+# export LC_COLLATE="C"
+
+# Pager/Less
+export LESS="-F -X -R"
+
+# DEFAULT_USER (for agnoster prompt)
+export DEFAULT_USER=sean
+
+[ -z "$HOSTNAME" ] && HOSTNAME=$(hostname)
+
+# Color TERM
+if [ "$COLORTERM" = "gnome-terminal" ]; then
+	case $TERM in
+		xterm)
+			TERM=xterm-256color
+			;;
+		screen)
+			TERM=screen-256color
+			;;
+		*)
+			echo "don't know how to go 256 colors for TERM=$TERM"
+			;;
+	esac
+fi
+
+# dot_vim token for updating readme using github api
+export GITHUB_DOT_VIM_TOKEN="8763b2ceb045ae0c5698e9889fb02a4e32e91ed3"
+
+# Make options
+export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"

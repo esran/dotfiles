@@ -1,0 +1,4 @@
+echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_aliases >> $HOME/.dot_log
+
+# Get gvim to open in new tab in existing window
+alias gvim='gvim -p --remote-tab-silent'

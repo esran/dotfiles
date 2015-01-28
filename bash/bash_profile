@@ -1,0 +1,11 @@
+echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_profile >> $HOME/.dot_log
+
+[ -f /etc/justone_profile ] && . /etc/justone_profile
+
+PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+
+umask 022
+
+[ -f ~/.bashrc ] && . ~/.bashrc
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

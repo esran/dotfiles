@@ -1,0 +1,27 @@
+echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
+
+# This gets loaded as the only startup file prior to the gnome-session
+
+# Path tweaks
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+PATH=/usr/lib/ccache:$PATH # Add ccache to front of path
+
+# Locally installed stuff
+PATH=$HOME/local/bin:$PATH
+MANPATH=$HOME/local/share/man:$MANPATH
+
+# Always stick my bin on the front of the path
+PATH=$HOME/bin:$PATH
+
+export PATH MANPATH
+
+# Justone variables and paths
+[ -f /etc/justone_profile ] && . /etc/justone_profile
+export PGTESTDIR=~/Test
+[ ! -d $PGTESTDIR ] && mkdir $PGTESTDIR
+
+# Make
+export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"
+
+# Sensible file permissions by default
+umask 022
