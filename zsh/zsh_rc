@@ -2,9 +2,30 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_log
 
 # Runs second (after .zprofile) for each shell created in the gnome-session
 
+# Find out true location. Note that this assumes we have actually
+# been installed as ~/.zshrc!
+if [[ -z $DOTFILES ]]
+then
+	DOTFILES=$(readlink ~/.zshrc)
+	if [[ $? -eq 0 ]]
+	then
+		DOTFILES=$(dirname $DOTFILES)
+		DOTFILES=${DOTFILES%/zsh}
+		# Check for a relative path which won't start with a slash
+		if [[ -n ${DOTFILES##/*} ]]
+		then
+			DOTFILES=~/$DOTFILES
+		fi
+	else
+		DOTFILES=~/.dotfiles
+	fi
+fi
+
+export DOTFILES
+
 # Antigen
-if [ -f $HOME/.antigen/antigen.zsh ]; then
-	source "$HOME/.antigen/antigen.zsh"
+if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
+	source "$DOTFILES/externals/antigen/antigen.zsh"
 
 	antigen-use oh-my-zsh
 
