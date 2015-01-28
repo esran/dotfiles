@@ -78,16 +78,6 @@ then
 	done
 fi
 
-# Add any functions from my scripts/zsh folder (TODO: legacy, remove this)
-if [ -d ~/scripts/zsh ]
-then
-	fpath+=~/scripts/zsh
-	for f in ~/scripts/zsh/*
-	do
-		[ -f $f ] && autoload $(basename $f)
-	done
-fi
-
 # PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 set path+=~/.rvm/bin
 
