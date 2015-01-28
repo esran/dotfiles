@@ -30,7 +30,7 @@ export DEFAULT_USER=sean
 [ -z "$HOSTNAME" ] && HOSTNAME=$(hostname)
 
 # Color TERM
-if [[ -z $COLORTERM -o "$COLORTERM" = "gnome-terminal" ]]; then
+if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 	case $TERM in
 		xterm)
 			TERM=xterm-256color
