@@ -82,7 +82,7 @@ fi
 set path+=~/.rvm/bin
 
 # dircolors
-[ -f ~/Stuff/dircolors-solarized/dircolors.ansi-light ] && eval `dircolors ~/Stuff/dircolors-solarized/dircolors.ansi-light`
+[ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ] && eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
 
 # turn of nomatch so that stuff like -? and ^. works
 setopt nonomatch
