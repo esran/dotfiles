@@ -2,10 +2,40 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
 
 # This gets loaded as the only startup file prior to the gnome-session
 
+# Find out true location. Note that this assumes we have actually
+# been installed as ~/.profile!
+if [[ -z $DOTFILES ]]
+then
+	DOTFILES=$(readlink ~/.profile)
+	if [[ $? -eq 0 ]]
+	then
+		DOTFILES=$(dirname $DOTFILES)
+		DOTFILES=${DOTFILES%/common}
+		# Check for a relative path which won't start with a slash
+		if [[ -n ${DOTFILES##/*} ]]
+		then
+			DOTFILES=~/$DOTFILES
+		fi
+	else
+		DOTFILES=~/.dotfiles
+	fi
+fi
+
+export DOTFILES
+
 # Add RVM to PATH for scripting
 if [[ -d ~/.rvm/bin ]]
 then
 	PATH=$PATH:$HOME/.rvm/bin
+fi
+
+# Library path
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+
+# Provisioning folder for RVM
+if [[ -d /opt/$USER/provision ]]
+then
+	PATH=$PATH:/opt/$USER/provision
 fi
 
 # Add ccache to front of path
@@ -21,6 +51,7 @@ MANPATH=$HOME/local/share/man:$MANPATH
 # Always stick my bin on the front of the path
 PATH=$HOME/bin:$PATH
 
+# Ensure PATH and MANPATH are exported
 export PATH MANPATH
 
 # Justone variables and paths
@@ -30,6 +61,29 @@ export PGTESTDIR=~/Test
 
 # Make
 export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"
+
+# Temp folder
+export TMPDIR=/tmp/${USER:-$LOGNAME}
+[[ ! -d $TMPDIR ]] && mkdir $TMPDIR
+
+# Setup solarized dircolors
+if [ -d $DOTFILES/externals/dircolors-solarized ]; then
+	if [ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]; then
+		eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
+	fi
+fi
+
+# Java home
+if [[ -z $JAVA_HOME ]]
+then
+	case `hostname` in
+		iowa)
+			export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+			;;
+		*)
+			;;
+	esac
+fi
 
 # Sensible file permissions by default
 umask 022
