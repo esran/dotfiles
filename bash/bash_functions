@@ -1,0 +1,593 @@
+# vim: syn=sh
+# vim: set filetype=zsh :
+
+gv () {
+	if [[ -n $GVIM_SERVER ]]
+	then
+		_host=$GVIM_SERVER
+	else
+		case $HOSTNAME in
+		sean-PC)
+			_host=GVIM
+			;;
+		*)
+			_host=$HOSTNAME
+			;;
+		esac
+	fi
+
+	if [[ -z $@ ]]
+	then
+		command gvim --servername $_host;
+	else
+		command gvim --servername $_host --remote-tab-silent "$@" || command gvim --servername $_host "$@";
+	fi
+}
+
+vv () {
+	if [[ -n $VIM_SERVER ]]
+	then
+		_host=$VIM_SERVER
+	else
+		case $HOSTNAME in
+		sean-PC)
+			_host=VVIM
+			;;
+		*)
+			_host=$HOSTNAME
+			;;
+		esac
+	fi
+
+	if [[ -z $@ ]]
+	then
+		command vim --servername $_host;
+	else
+		command vim --servername $_host --remote-tab-silent "$@" || command vim --servername $_host "$@";
+	fi
+}
+
+history_of_file() {
+    url=$1 # current url of file
+    svn log -q $url | grep -E -e "^r[[:digit:]]+" -o | cut -c2- | sort -n | {
+
+#       first revision as full text
+        echo
+        read r
+        svn log -r$r $url@HEAD
+        svn cat -r$r $url@HEAD
+        echo
+
+#       remaining revisions as differences to previous revision
+        while read r
+        do
+            echo
+            svn log -r$r $url@HEAD
+            svn diff -c$r $url@HEAD
+            echo
+        done
+    }
+}
+
+pg_check_instance()
+{
+	_instance=$1
+	# Check instance is numeric
+	if ! [[ ${_instance##[0-9]*} == "" ]]
+	then
+		echo "pg_check_instance: instance is not numeric ($_instance)"
+		return 1
+	fi
+
+	# Check instance is in range (1..20)
+	if [ $_instance -lt 1 ] || [ $_instance -gt 20 ]
+	then
+		echo "pg_check_instance: instance out of range ($_instance)"
+		return 1
+	fi
+
+	_PGDATA=${PGDATA}+$_instance
+	_JO_CONFIG=${JO_CONFIG}+$_instance
+	(( _PGPORT = $PGPORT + $_instance ))
+
+	# Check PGDATA directory exists
+	if ! [ -d $_PGDATA ]
+	then
+		echo "pg_check_instance: instance directory does not exist ($_PGDATA)"
+		return 1
+	fi
+
+	# Check JO_CONFIG file exists
+	if ! [ -f $_JO_CONFIG ]
+	then
+		echo "pg_check_instance: jo configuration file does not exists ($_JO_CONFIG)"
+		return 1
+	fi
+
+	_dir=`awk '/^ServerRoot/ { print $2 }' $_JO_CONFIG`
+	
+	# Check config dir points to correct place
+	if ! [ "$_dir" == "$_PGDATA/JustOne" ]
+	then
+		echo "pg_check_instance: jo configuration ServerRoot is incorrect ($_dir)"
+		return 1
+	fi
+}
+
+pg_start()
+{
+	if [ "$1" == "" ]
+	then
+		_JO_CONFIG=$JO_CONFIG
+		_PGDATA=$PGDATA
+		_PGPORT=$PGPORT
+	else
+		if ! pg_check_instance $*
+		then
+			echo "pg_start: invalid instance"
+			return 1
+		fi
+	fi
+
+	# Save current JO_CONFIG value and reset it to this instance
+	_OLD_JO_CONFIG=$JO_CONFIG
+	JO_CONFIG=$_JO_CONFIG
+
+	# Start up postgres
+	pg_ctl -D $_PGDATA -o "-p $_PGPORT" start
+
+	# Reset the original JO_CONFIG value
+	JO_CONFIG=$_OLD_JO_CONFIG
+
+	unset _JO_CONFIG _OLD_JO_CONFIG _PGDATA _PGPORT
+}
+
+pg_stop()
+{
+	if [ "$1" == "" ]
+	then
+		_JO_CONFIG=$JO_CONFIG
+		_PGDATA=$PGDATA
+		_PGPORT=$PGPORT
+	else
+		if ! pg_check_instance $*
+		then
+			echo "pg_stop: invalid instance"
+			return 1
+		fi
+	fi
+
+	# Save current JO_CONFIG value and reset it to this instance
+	_OLD_JO_CONFIG=$JO_CONFIG
+	JO_CONFIG=$_JO_CONFIG
+
+	# Start up postgres
+	pg_ctl -D $_PGDATA -o "-p $_PGPORT" stop
+
+	# Reset the original JO_CONFIG value
+	JO_CONFIG=$_OLD_JO_CONFIG
+
+	unset _JO_CONFIG _OLD_JO_CONFIG _PGDATA _PGPORT
+}
+
+pg_restart()
+{
+	pg_stop
+	sleep 1
+	pg_start
+	sleep 1
+}
+
+pg_logrotate()
+{
+	psql -c "select pg_rotate_logfile()" postgres
+}
+
+pg_init()
+{
+	# Initialise a new postgres database with $USER as the superuser
+	$JO_INST_PG/bin/initdb -D ${1:-$PGDATA}
+}
+
+retag()
+{
+	# Retag the C files (optional start directory)
+	( cd /home/$USER/src/Postgres; ctags -R . )
+	( cd /home/$USER/src/JustOne; ctags -R . )
+}
+
+jo_build()
+{
+	# Rebuild JustOne from the current directory
+	make clean
+	./autogen.sh
+	JustOne/configure
+	make
+
+	[[ "$1" == '-i' ]] && make install
+}
+
+jo_reset()
+{
+	echo -n "Resetting JustOne database directory $PGDATA/JustOne, enter Y/y to confirm ..."
+	read LINE
+
+	if [[ $LINE == "Y" || $LINE == "y" ]]; then
+		cd $PGDATA/JustOne
+		chmod -R a+rwx coll enum heap iden meas meta
+		rm -r coll enum heap iden meas meta
+	fi
+}
+
+pg_build()
+{
+	# Rebuild Postgres from the current directory
+	JustOne/configure
+	make clean
+	[[ ! -f src/Makefile.custom ]] && cp JustOne/Makefile.custom src/Makefile.custom
+	make
+
+	[[ "$1" == '-i' ]] && make install
+}
+
+get_justone()
+{
+	# Get the Justone code again ....
+	echo -n "Getting the JustOne codebase again, press return to confirm..."
+	read Line
+	cd /home/$USER/justone/test/JustOne
+	svn update
+	#svn checkout  http://svn/JustOne/trunk /home/$USER/justone/test/JustOne
+}
+
+vi_nonempty()
+{
+	# Vi all of the non empty files supplied as parameters
+	declare -a NON_EMPTY
+	subs=0
+	for FILE in "$@"
+	do
+		if [[ -s "$FILE" ]]; then
+			NON_EMPTY[$subs]="$FILE"
+			(( subs = subs + 1 ))
+		fi
+	done
+
+	gvim "${NON_EMPTY[@]}"
+}
+
+pg_vilog()
+{
+	# Find the latest Postgres log and run it in gvim
+	pushd $PGDATA/pg_log
+	LatestFile=$(ls -utr postgres*.log | tail -1)
+	[[ -n "$LatestFile" ]] && gvim $LatestFile
+	popd
+}
+
+pg_taillog()
+{
+	# Find the latest Postgres log and run it in gvim
+	pushd $PGDATA/pg_log
+	LatestFile=$(ls -utr postgres*.log | tail -1)
+	[[ -n "$LatestFile" ]] && tail $* $LatestFile
+	popd
+}
+
+pg_greplog()
+{
+	# Find the latest Postgres log and run it in gvim
+	pushd $PGDATA/pg_log
+	LatestFile=$(ls -utr postgres*.log | tail -1)
+	[[ -n "$LatestFile" ]] && grep "$*" $LatestFile
+	popd
+}
+
+pg_viconf()
+{
+	# Find the latest Postgres log and run it in gvim
+	gvim $PGDATA/postgresql.conf
+}
+
+pg_extractlog()
+{
+	# Find the latest Postgres log and extract the plans
+	XMLFile=${1:-~/public_html/plans.xml}
+	TxtFile=${XMLFile%.xml}.txt
+
+	cd $PGDATA/pg_log
+	LatestFile=$(ls -utr postgres*.log | tail -1)
+	if [[ -n "$LatestFile" ]]; then
+		ExtractPlans.pl -s -a $LatestFile > $XMLFile
+		xmllint --format --output $TxtFile $XMLFile
+	fi
+}
+
+pg_quicktest()
+{
+	# Give Postgres a single SQL statement, run this, vi the log file and also create an XML file from the log file
+	if (( $# == 2 )); then
+		Database=$1
+		shift
+	else
+		Database=$USER
+	fi
+	Statement=${1:?Please give an SQL statement to run}
+
+	XMLFile=/tmp/dw1.xml
+	pg_logrotate
+	sleep 1
+	psql $Database -c "$Statement"
+
+	# Extract the XML
+	cd $PGDATA/pg_log
+	LatestFile=$(ls -utr postgres*.log | tail -1)
+	if [[ -n "$LatestFile" ]]; then
+		ExtractPlans.pl -e $LatestFile > $XMLFile
+		xmllint --format --output $XMLFile $XMLFile
+		echo "XML from log file is in $XMLFile"
+
+		gvim + $LatestFile
+	else
+		# No log file found!
+		echo "Strange, I didn't find a log file ..."
+	fi
+}
+
+cfind()
+{
+	# Do a find for C files from the current directory and find matching files for the given grep
+	# Optional -l parameter will determine if just filenames are output, otherwise both matches and files ...
+	if (( $# == 2 )); then
+		Option=$1
+		shift
+	else
+		Option=""
+	fi
+
+	GrepExpr="$1"
+
+	if [[ "$Option" == "-l" ]]; then
+		find . -name '*.c' -exec grep -l "$GrepExpr" {} \;
+	else
+		find . -name '*.c' -exec grep "$GrepExpr" {} \; -print
+	fi
+}
+
+hfind()
+{
+	# SHOULD BE MERGED WITH CFIND SOMETIME, AS THEY ARE PRETTY IDENTICAL
+	# Do a find for C files from the current directory and find matching files for the given grep
+	# Optional -l parameter will determine if just filenames are output, otherwise both matches and files ...
+	if (( $# == 2 )); then
+		Option=$1
+		shift
+	else
+		Option=""
+	fi
+
+	GrepExpr="$1"
+
+	if [[ "$Option" == "-l" ]]; then
+		find . -name '*.h' -exec grep -l "$GrepExpr" {} \;
+	else
+		find . -name '*.h' -exec grep "$GrepExpr" {} \; -print
+	fi
+}
+
+cppfind()
+{
+	# Do a find for C++ files from the current directory and find matching files for the given grep
+	# Optional -l parameter will determine if just filenames are output, otherwise both matches and files ...
+	if (( $# == 2 )); then
+		Option=$1
+		shift
+	else
+		Option=""
+	fi
+
+	GrepExpr="$1"
+
+	if [[ "$Option" == "-l" ]]; then
+		find . \( -name '*.cpp' -o -name '*.h' \) -exec grep -il "$GrepExpr" {} \;
+	else
+		find . \( -name '*.cpp' -o -name '*.h' \) -exec grep -i "$GrepExpr" {} \; -print
+	fi
+}
+
+vitest()
+{
+	# VI the test files given by the number supplied as a parameter. Optional param 2 subdirectory for results
+	NUM=$1
+	RESULTSDIR=${2:-results}
+	FILES=""
+	for FILE in sql/jo_ut_test${NUM}_main.sql correct32*/jo_ut_test${NUM}_correct.txt correct32*/jo_ut_test${NUM}_correct-explain.txt correct32*/jo_ut_test${NUM}_correct.xml $RESULTSDIR/jo_ut_test${NUM}_results.txt $RESULTSDIR/jo_ut_test${NUM}_results-explain.txt $RESULTSDIR/jo_ut_test${NUM}_results.xml $RESULTSDIR/jo_ut_test${NUM}_results.txt-diff $RESULTSDIR/jo_ut_test${NUM}_results-explain.txt-diff $RESULTSDIR/jo_ut_test${NUM}_results.xml-diff
+	do
+		if [[ -f $FILE ]]; then
+			FILES="$FILES $FILE"
+		fi
+	done
+	gv $FILES
+}
+
+vitestsql()
+{
+	# VI the test files given by the number(s) supplied as parameters
+	Files=""
+	for Num in $*
+	do
+		Files="$Files sql/jo_ut_test${Num}_init.sql sql/jo_ut_test${Num}_main.sql sql/jo_ut_test${Num}_post.sql"
+	done
+	gvim -o $Files
+}
+
+gvimf()
+{
+	# Start up gvim, but use a find on the first argument.
+	PARAMS=""
+	FIND_OR_SFIND="find"
+	for i in "$@"
+	do
+		PARAMS="$PARAMS -c '$FIND_OR_SFIND $i'"
+		FIND_OR_SFIND="sfind"
+	done
+
+	eval gvim "$PARAMS"
+}
+
+gvimt()
+{
+	# Start up gvim, but use a find on the first argument.
+	PARAMS=""
+	TAG_OF_STAG="tag"
+	for i in "$@"
+	do
+		PARAMS="$PARAMS -c '$TAG_OF_STAG $i'"
+		TAG_OF_STAG="stag"
+	done
+
+	eval gvim "$PARAMS"
+}
+
+makeo()
+{
+	# Make an object file by specifying just a filename (no path)
+	# Assume that it's a Postgres file ...
+	pushd ~/src/Postgres
+	for FILE in "$@"
+	do
+		find . -name $FILE |
+			while read FOUND_FILE
+			do
+				DOT_O=${FOUND_FILE%.c}.o
+				make $DOT_O
+			done
+	done
+	popd
+}
+
+pgshow()
+{
+	# Show all postgres processes running
+	ps -fu ${1:-$USER} | grep postgres | grep -v vi | grep -v grep
+}
+
+pgzap()
+{
+	# Kill any postgres processes running
+	pgshow $* | awk '{print($2)}' | xargs -r kill -9
+}
+
+pgddd()
+{
+	# Run ddd on a running Postgres backend process (if there are more than one, it will go for the first)
+	# First check for a single user process
+	PID=$(ps -fu $USER | grep 'postgres --single' | grep -v grep | awk '{print($2)}')
+	if [[ -n "$PID" ]]; then
+		ddd $(which postgres) --attach $PID &
+	fi
+
+	# Failing that, check for a normal postgres server, of which there may be many
+	PID=$(ps -fu sean |grep "postgres: $USER" | grep -v grep | head -1 | awk '{print($2)}')
+	if [[ -n "$PID" ]]; then
+		ddd $(which postgres) --attach $PID &
+	fi
+}
+
+zap()
+{
+	# Kill any processes running that match the pattern
+	ps -ef | grep $* | grep -v grep | awk '{print($2)}' | xargs -r kill -9
+}
+
+modjoin()
+{
+	# Modify a Join from Paul's join tests, by changing all double quotes to single ones
+	echo "$*" | sed "s/\"/'/g"
+}
+
+kd_check()
+{
+	local _version=$1
+	local _test=$2
+	local _suffix=$3
+	local _notunnel=${_version%-tunnel}
+
+	local _correct=""
+	local _file
+	for _file in correct32-${_notunnel}/jo_ut_test${_test}_*correct${_suffix}; do
+		[[ -f $_file ]] && _correct=$_file
+	done
+
+	if [[ -z $_correct ]]; then
+		# echo "no correct file"
+		return
+	fi
+
+	# echo -n "${_correct}/"
+
+	local _result=""
+	for _file in .check.${_version}/results/jo_ut_test${_test}_*results${_suffix}; do
+		[[ -f $_file ]] && _result=$_file
+	done
+
+	if [[ -z $_result ]]; then
+		# echo "no result file"
+		return
+	fi
+
+	# echo -n "${_result}/"
+
+	local _diff=""
+	for _file in .check.${_version}/results/jo_ut_test${_test}_*results${_suffix}-diff; do
+		[[ -f $_file ]] && _diff=$_file
+	done
+
+	if [[ -z $_diff ]]; then
+		# echo "no diff file"
+		return
+	fi
+
+	# echo -n "${_diff}/"
+
+	# local _ndiff=$(grep -c $_diff unittest-check-${_version}.log)
+    #
+	# if [[ $_ndiff -eq 0 ]]; then
+	# 	# echo "not in log file"
+	# 	return
+	# fi
+
+	diff $_correct $_result > /dev/null 2>&1
+
+	if [[ $? -eq 0 ]]; then
+		# echo "no differences"
+		return
+	fi
+
+	# echo -n "..."
+	echo -n "$_test $_suffix $_version : ..."
+
+	kdiff3 $_correct $_result -o $_correct
+	echo $?
+}
+
+kd()
+{
+	local _versions=(v1 v1r2 v2 v2r2 v1-tunnel v1r2-tunnel v2-tunnel v2r2-tunnel pg)
+	local _test
+	local _version
+
+	for _test in $*; do
+		for _version in ${_versions[*]}; do
+			# results
+			kd_check $_version $_test ".txt"
+
+			# explain
+			kd_check $_version $_test "-explain.txt"
+
+			# xml
+			kd_check $_version $_test ".xml"
+		done
+	done
+
+}

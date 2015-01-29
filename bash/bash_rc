@@ -7,8 +7,31 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_rc >> $HOME/.dot_log
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# Find out true location. Note that this assumes we have actually
+# been installed as ~/.zshrc!
+if [[ -z $DOTFILES ]]
+then
+	DOTFILES=$(readlink ~/.bashrc)
+	if [[ $? -eq 0 ]]
+	then
+		DOTFILES=$(dirname $DOTFILES)
+		DOTFILES=${DOTFILES%/bash}
+		# Check for a relative path which won't start with a slash
+		if [[ -n ${DOTFILES##/*} ]]
+		then
+			DOTFILES=~/$DOTFILES
+		fi
+	else
+		DOTFILES=~/.dotfiles
+	fi
+fi
+
+export DOTFILES
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
+# ... or force ignoredups and ignorespace
 HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
@@ -24,7 +47,7 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -36,7 +59,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
+    xterm|xterm-color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -73,7 +96,13 @@ esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+	# Setup solarized dircolors
+	if [ -d $DOTFILES/externals/dircolors-solarized ]; then
+		if [ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]; then
+			eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
+		fi
+	fi
+
     alias ls='ls --color=auto'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
@@ -101,19 +130,58 @@ then
     . ~/.bash_aliases
 fi
 
+# Snazzy GIT prompt
+if [[ -f $DOTFILES/externals/git-prompt/git-prompt.sh ]]
+then
+	. $DOTFILES/externals/git-prompt/git-prompt.sh
+fi
+
+# Liquid Prompt
+if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
+then
+	source $DOTFILES/externals/liquidprompt/liquidprompt
+fi
+
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [[ -f /etc/bash_completion -a ! shopt -oq posix ]]
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix
 then
     . /etc/bash_completion
 fi
 
-# Liquid Prompt TODO: set this up as an external
-# source ~/Stuff/liquidprompt/liquidprompt
+# Functions
+# TODO: separate these out as separate files, like zsh?
+if [[ -f ~/.bash_functions ]]
+then
+	source ~/.bash_functions
+fi
 
 # Add RVM to PATH for scripting
 if [[ -d ~/.rvm/bin ]]
 then
 	PATH=$PATH:~/.rvm/bin
 fi
+
+# Perlbrew and rvm configuration
+[[ -f ~/perl5/perlbrew/etc/bashrc ]] && source ~/perl5/perlbrew/etc/bashrc
+[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
+
+# Hostfile for completion
+HOSTFILE=$HOME/bash_hosts.txt
+
+get_host_file()
+{
+	dig intranet. axfr | awk '/IN\tA\t/ {sub(".intranet.", "", $1); print $1}' > $HOSTFILE
+
+	# Add any cloud hosts
+	echo "sigma-1.justonedb.com" >> $HOSTFILE
+	echo "lambda-1.justonedb.com" >> $HOSTFILE
+
+	# Add some personal hostgs
+	echo "home.conical-effort.net" >> $HOSTFILE
+	echo "ioctl.org" >> $HOSTFILE
+	echo "mono.org" >> $HOSTFILE
+}
+
+[[ ! -f $HOSTFILE ]] && get_host_file
