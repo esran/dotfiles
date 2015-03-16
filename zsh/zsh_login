@@ -1,5 +1,8 @@
 echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_login >> $HOME/.dot_log
 
+# Initialise DOTFILES
+[[ -f $HOME/.dot ]] && source $HOME/.dot
+
 # Runs last (after .zprofile -> .zshrc) for each shell created in the gnome-session
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

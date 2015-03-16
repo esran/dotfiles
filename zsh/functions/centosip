@@ -1,0 +1,4 @@
+# vim: set filetype=zsh :
+centosip () {
+	VBoxManage guestproperty enumerate "CentOS" | grep "Net.*V4.*IP" | sed -e 's/^.*value: \([^,]*\),.*$/\1/'
+}

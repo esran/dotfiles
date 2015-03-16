@@ -1,25 +1,7 @@
 echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env >> $HOME/.dot_log
 
-# Find out true location. Note that this assumes we have actually
-# been installed as ~/.zshenv!
-if [[ -z $DOTFILES ]]
-then
-	DOTFILES=$(readlink ~/.zshenv)
-	if [[ $? -eq 0 ]]
-	then
-		DOTFILES=$(dirname $DOTFILES)
-		DOTFILES=${DOTFILES%/zsh}
-		# Check for a relative path which won't start with a slash
-		if [[ -n ${DOTFILES##/*} ]]
-		then
-			DOTFILES=~/$DOTFILES
-		fi
-	else
-		DOTFILES=~/.dotfiles
-	fi
-fi
-
-export DOTFILES
+# Initialise DOTFILES
+[ -f $HOME/.dot ] && . $HOME/.dot
 
 # Pick up completion functions
 if [[ -d $DOTFILES/zsh/completion ]]

@@ -2,65 +2,94 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
 
 # This gets loaded as the only startup file prior to the gnome-session
 
-# Find out true location. Note that this assumes we have actually
-# been installed as ~/.profile!
-if [[ -z $DOTFILES ]]
+# Initialise DOTFILES
+[[ -f $HOME/.dot ]] && source $HOME/.dot
+
+# Check if we've been loaded before
+if [[ -n $DOTFILES_PROFILE ]]
 then
-	DOTFILES=$(readlink ~/.profile)
-	if [[ $? -eq 0 ]]
-	then
-		DOTFILES=$(dirname $DOTFILES)
-		DOTFILES=${DOTFILES%/common}
-		# Check for a relative path which won't start with a slash
-		if [[ -n ${DOTFILES##/*} ]]
-		then
-			DOTFILES=~/$DOTFILES
-		fi
-	else
-		DOTFILES=~/.dotfiles
-	fi
+    # Check timestamp of ourself and only carry on if newer
+    PROFILE_TS=$(stat -c %Y $DOTFILES/common/profile)
+    if [[ $PROFILE_TS -lt $DOTFILES_PROFILE ]]
+    then
+	return
+    fi
+
+    DOTFILES_RELOAD=1
+else
+    DOTFILES_RELOAD=0
 fi
 
-export DOTFILES
+export DOTFILES_PROFILE=$(date +%s)
+
+#################
+# Path functions.
+#################
+
+# Path add function
+# If there is a second parameter then prepend instead of append
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+	if [ -z "$2" ]; then
+            PATH="${PATH:+"$PATH:"}$1"
+	else
+	    PATH="$1${PATH:+":$PATH"}"
+	fi
+    fi
+}
+
+# LD_LIBRARY_PATH
+ldpathadd() {
+    if [ -d "$1" ] && [[ ":$LD_LIBRARY_PATH:" != *":$1:"* ]]; then
+        LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}$1"
+    fi
+}
+
+# MANPATH
+manpathadd() {
+    if [ -d "$1" ] && [[ ":$MANPATH:" != *":$1:"* ]]; then
+        MANPATH="${MANPATH:+"$MANPATH:"}$1"
+    fi
+}
 
 # Add RVM to PATH for scripting
-if [[ -d ~/.rvm/bin ]]
-then
-	PATH=$PATH:$HOME/.rvm/bin
-fi
+pathadd ~/.rvm/bin
 
 # Library path
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+ldpathadd /usr/local/lib
 
 # Provisioning folder for RVM
-if [[ -d /opt/$USER/provision ]]
-then
-	PATH=$PATH:/opt/$USER/provision
-fi
+addpath /opt/$USER/provision
 
 # Add ccache to front of path
-if [[ -d /usr/lib/ccache ]]
-then
-	PATH=/usr/lib/ccache:$PATH
-fi
+pathadd /usr/lib/ccache pre
 
 # Locally installed stuff
-PATH=$HOME/local/bin:$PATH
-MANPATH=$HOME/local/share/man:$MANPATH
+pathadd ~/loca/bin
+manpathadd ~/local/share/man
 
 # Always stick my bin on the front of the path
-PATH=$HOME/bin:$PATH
+pathadd ~/bin pre
 
 # Ensure PATH and MANPATH are exported
-export PATH MANPATH
+export PATH LD_LIBRARY_PATH MANPATH
 
 # Justone variables and paths
-[[ -f /etc/justone_profile ]] && . /etc/justone_profile
+# Don't reprocess this if we're reloading
+if [ ! $DOTFILES_RELOAD ]; then
+    if [ -f /etc/justone_profile ]; then
+	. /etc/justone_profile
+    fi
+fi
+
+# Setup test directory for PostgreSQL JustOne tests
 export PGTESTDIR=~/Test
-[[ ! -d $PGTESTDIR ]] && mkdir $PGTESTDIR
+if [ ! -d $PGTESTDIR ]; then
+	mkdir $PGTESTDIR
+fi
 
 # Make
-export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) --no-print-directory V=0"
+export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) V=0"
 
 # Temp folder
 export TMPDIR=/tmp/${USER:-$LOGNAME}
