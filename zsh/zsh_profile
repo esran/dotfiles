@@ -10,7 +10,7 @@ then
 fi
 
 # Also handled in .profile but useful to have it here 
-if [[ -n $PGTESTDIR ]]
+if [[ -z $PGTESTDIR ]]
 then
 	PGTESTDIR=~/Test
 	[[ ! -d $PGTESTDIR ]] && mkdir $PGTESTDIR
