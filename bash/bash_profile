@@ -1,9 +1,10 @@
 echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_profile >> $HOME/.dot_log
 
-[ -f /etc/justone_profile ] && . /etc/justone_profile
+# Initialise DOTFILES
+[ -f $HOME/dot ] && . $HOME/.dot
 
-# My bin on path first
-PATH=~/bin:$PATH
+# Load common profile
+[ -f $HOME/.profile ] && . $HOME/.profile
 
 # Some perl hackery
 if [[ -d ~/perl5/lib/perl5 ]]

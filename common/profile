@@ -30,25 +30,35 @@ export DOTFILES_PROFILE=$(date +%s)
 # If there is a second parameter then prepend instead of append
 pathadd() {
     if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-	if [ -z "$2" ]; then
-            PATH="${PATH:+"$PATH:"}$1"
-	else
-	    PATH="$1${PATH:+":$PATH"}"
-	fi
+		if [ -z "$2" ]; then
+			PATH="${PATH:+"$PATH:"}$1"
+		else
+			PATH="$1${PATH:+":$PATH"}"
+		fi
     fi
 }
 
 # LD_LIBRARY_PATH
+# If there is a second parameter then prepend instead of append
 ldpathadd() {
     if [ -d "$1" ] && [[ ":$LD_LIBRARY_PATH:" != *":$1:"* ]]; then
-        LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}$1"
+		if [ -z "$2" ]; then
+			LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}$1"
+		else
+			LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH:+":$LD_LIBRARY_PATH"}"
+		fi
     fi
 }
 
 # MANPATH
+# If there is a second parameter then prepend instead of append
 manpathadd() {
     if [ -d "$1" ] && [[ ":$MANPATH:" != *":$1:"* ]]; then
-        MANPATH="${MANPATH:+"$MANPATH:"}$1"
+		if [ -z "$2" ]; then
+			MANPATH="${MANPATH:+"$MANPATH:"}$1"
+		else
+			MANPATH="$1${MANPATH:+":$MANPATH"}"
+		fi
     fi
 }
 
@@ -59,14 +69,16 @@ pathadd ~/.rvm/bin
 ldpathadd /usr/local/lib
 
 # Provisioning folder for RVM
-addpath /opt/$USER/provision
+pathadd /opt/$USER/provision
 
 # Add ccache to front of path
 pathadd /usr/lib/ccache pre
 
 # Locally installed stuff
-pathadd ~/loca/bin
-manpathadd ~/local/share/man
+pathadd ~/local/bin pre
+ldpathadd ~/local/lib pre
+manpathadd ~/local/share/man pre
+manpathadd ~/local/man pre
 
 # Always stick my bin on the front of the path
 pathadd ~/bin pre
@@ -78,7 +90,7 @@ export PATH LD_LIBRARY_PATH MANPATH
 # Don't reprocess this if we're reloading
 if [ ! $DOTFILES_RELOAD ]; then
     if [ -f /etc/justone_profile ]; then
-	. /etc/justone_profile
+		. /etc/justone_profile
     fi
 fi
 
@@ -107,7 +119,7 @@ if [[ -z $JAVA_HOME ]]
 then
 	case `hostname` in
 		iowa)
-			export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+			export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
 			;;
 		*)
 			;;
