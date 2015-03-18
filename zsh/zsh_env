@@ -9,14 +9,6 @@ then
 	fpath=($fpath $DOTFILES/zsh/completion)
 fi
 
-# Add my stuff to the path
-# path=(~/local/bin $path)
-path=(~/bin $path)
-
-# Library path
-# LD_LIBRARY_PATH=~/local/lib:$LD_LIBRARY_PATH
-# export LD_LIBRARY_PATH
-
 # Perlbrew
 if [[ -f ~/perl5/perlbrew/etc/bashrc ]]
 then

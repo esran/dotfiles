@@ -62,15 +62,6 @@ then
 	done
 fi
 
-# PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-set path+=~/.rvm/bin
-
-# Solarized dircolors
-if [[ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]]
-then
-	eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
-fi
-
 # turn of nomatch so that stuff like -? and ^. works
 setopt nonomatch
 

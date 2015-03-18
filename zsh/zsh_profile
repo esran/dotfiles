@@ -3,19 +3,8 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
 
-# This should get picked up by .profile
-if [[ -z $JO_INST_JO ]]
-then
-	[ -f /etc/justone_profile ] && . /etc/justone_profile
-fi
-
-# Also handled in .profile but useful to have it here 
-if [[ -z $PGTESTDIR ]]
-then
-	PGTESTDIR=~/Test
-	[[ ! -d $PGTESTDIR ]] && mkdir $PGTESTDIR
-	export PGTESTDIR
-fi
+# Load common profile
+[[ -f $HOME/.profile ]] && source $HOME/.profile
 
 # Runs first for each shell created in the gnome-session
 
@@ -31,6 +20,7 @@ export LESS="-F -X -R"
 export DEFAULT_USER=sean
 
 [ -z "$HOSTNAME" ] && HOSTNAME=$(hostname)
+export HOSTNAME
 
 # Color TERM
 if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
@@ -46,12 +36,3 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 			;;
 	esac
 fi
-
-# dot_vim token for updating readme using github api
-export GITHUB_DOT_VIM_TOKEN="8763b2ceb045ae0c5698e9889fb02a4e32e91ed3"
-
-# Make options
-export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) V=0"
-
-# Ensure sensible umask
-umask 022
