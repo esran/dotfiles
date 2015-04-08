@@ -92,6 +92,7 @@ pathadd ~/bin pre
 if [[ -d ~/Stuff/git-hub ]]; then
 	pathadd ~/Stuff/git-hub/lib
 	manpathadd ~/Stuff/git-hub/man
+	export GIT_HUB_ROOT=$HOME/Stuff/git-hub
 fi
 
 # Ensure PATH and MANPATH are exported
