@@ -12,9 +12,11 @@ then
     PROFILE_TS=$(stat -c %Y $DOTFILES/common/profile)
     if [[ $PROFILE_TS -lt $DOTFILES_PROFILE ]]
     then
-	return
+		echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile already loaded! >> $HOME/.dot_log
+		return
     fi
 
+	echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile reloading! >> $HOME/.dot_log
     DOTFILES_RELOAD=1
 else
     DOTFILES_RELOAD=0
@@ -80,18 +82,26 @@ ldpathadd ~/local/lib pre
 manpathadd ~/local/share/man pre
 manpathadd ~/local/man pre
 
+# Setting MANPATH at all means default man path isn't checked :(
+manpathadd /usr/share/man
+
 # Always stick my bin on the front of the path
 pathadd ~/bin pre
+
+# git hub plugin
+if [[ -d ~/Stuff/git-hub ]]; then
+	pathadd ~/Stuff/git-hub/lib
+	manpathadd ~/Stuff/git-hub/man
+fi
 
 # Ensure PATH and MANPATH are exported
 export PATH LD_LIBRARY_PATH MANPATH
 
 # Justone variables and paths
-# Don't reprocess this if we're reloading
-if [ ! $DOTFILES_RELOAD ]; then
-    if [ -f /etc/justone_profile ]; then
+if [[ -z $JO_INST_JO ]]; then
+	if [ -f /etc/justone_profile ]; then
 		. /etc/justone_profile
-    fi
+	fi
 fi
 
 # Setup test directory for PostgreSQL JustOne tests

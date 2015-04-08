@@ -157,6 +157,11 @@ then
 	source ~/.bash_functions
 fi
 
+# git hub completion
+if [[ -f ~/Stuff/git-hub/share/completion.bash ]]; then
+	source ~/Stuff/git-hub/share/completion.bash
+fi
+
 # Add RVM to PATH for scripting
 if [[ -d ~/.rvm/bin ]]
 then

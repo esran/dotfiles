@@ -9,6 +9,10 @@ then
 	fpath=($fpath $DOTFILES/zsh/completion)
 fi
 
+if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
+	fpath=($fpath ~/Stuff/git-hub/share/zsh-completion)
+fi
+
 # Perlbrew
 if [[ -f ~/perl5/perlbrew/etc/bashrc ]]
 then
