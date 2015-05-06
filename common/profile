@@ -5,25 +5,6 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
 
-# Check if we've been loaded before
-if [[ -n $DOTFILES_PROFILE ]]
-then
-    # Check timestamp of ourself and only carry on if newer
-    PROFILE_TS=$(stat -c %Y $DOTFILES/common/profile)
-    if [[ $PROFILE_TS -lt $DOTFILES_PROFILE ]]
-    then
-		echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile already loaded! >> $HOME/.dot_log
-		return
-    fi
-
-	echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile reloading! >> $HOME/.dot_log
-    DOTFILES_RELOAD=1
-else
-    DOTFILES_RELOAD=0
-fi
-
-export DOTFILES_PROFILE=$(date +%s)
-
 #################
 # Path functions.
 #################
@@ -99,6 +80,8 @@ fi
 export PATH LD_LIBRARY_PATH MANPATH
 
 # Justone variables and paths
+# Try to ensure this only gets loaded once as it adds to the
+# path
 if [[ -z $JO_INST_JO ]]; then
 	if [ -f /etc/justone_profile ]; then
 		. /etc/justone_profile
@@ -112,6 +95,7 @@ if [ ! -d $PGTESTDIR ]; then
 fi
 
 # Make
+# Note the justone profile sets this, but we override it here
 export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) V=0"
 
 # Temp folder
