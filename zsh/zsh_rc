@@ -24,14 +24,13 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	case $TERM in
 		xterm*|screen*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme agnoster
+			antigen theme gnzh
 			;;
 		vt100)
 			;;
 		*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme agnoster
-			# echo "unhandled term type: $TERM"
+			antigen theme gnzh
 			;;
 	esac
 
