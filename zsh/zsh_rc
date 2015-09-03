@@ -18,7 +18,7 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	antigen-bundle svn
 	antigen-bundle mvn
 
-	antigen-bundle arialdomartini/oh-my-git
+	antigen bundle arialdomartini/oh-my-git
 	# antigen theme arialdomartini/oh-my-git-themes arialdo-granzestyle
 
 	antigen-bundle seletskiy/zsh-context-aliases
