@@ -81,8 +81,11 @@ export PATH LD_LIBRARY_PATH MANPATH
 
 # Justone variables and paths
 # Try to ensure this only gets loaded once as it adds to the
-# path
-if [[ -z $JO_INST_JO ]]; then
+# path. Do this by checking if 'env-check' is available. Can't
+# rely on checking environment variables as they are retained
+# when the PATH is cleared for stuff like 'tmux' sessions.
+which env-check > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
 	if [ -f /etc/justone_profile ]; then
 		. /etc/justone_profile
 	fi
