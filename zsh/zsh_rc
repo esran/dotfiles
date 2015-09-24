@@ -19,34 +19,34 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	antigen-bundle mvn
 
 	antigen bundle arialdomartini/oh-my-git
-	# antigen theme arialdomartini/oh-my-git-themes arialdo-granzestyle
 
 	antigen-bundle seletskiy/zsh-context-aliases
 
 	case $TERM in
 		xterm*|screen*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme gnzh
 			;;
 		vt100)
 			;;
 		*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme gnzh
 			;;
 	esac
 
 	antigen-bundle zsh-users/zsh-history-substring-search
+
+	# Theme
+	antigen theme gnzh
 
 	# Ruby
 	antigen-bundle ruby
 	antigen-bundle rvm
 
 	antigen-apply
-
-	# oh-my-zsh clobbers LESS :(
-	export LESS="-F -X -R"
 fi
+
+# oh-my-zsh clobbers LESS :(
+export LESS="-F -X -R"
 
 # History substring search
 zmodload zsh/terminfo
