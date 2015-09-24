@@ -56,6 +56,7 @@ pathadd /opt/$USER/provision
 
 # Add ccache to front of path
 pathadd /usr/lib/ccache pre
+pathadd ~/local/lib/ccache pre
 
 # Locally installed stuff
 pathadd ~/local/bin pre
