@@ -1,3 +1,11 @@
 :
 
-dig @oregon intranet. axfr | awk '/IN\tA\t/ { sub(".intranet.", "", $1); print $NF "\t" $1 }'
+case "$HOSTNAME" in
+	iowa|sean-pc)
+		dig @oregon intranet. axfr \
+			| awk '/IN\tA\t/ { sub(".intranet.", "", $1); print $NF "\t" $1 }'
+		;;
+	rebecca|proliant)
+		echo "rebecca proliant lucyliu"
+		;;
+esac
