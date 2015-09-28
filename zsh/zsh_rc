@@ -18,33 +18,35 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	antigen-bundle svn
 	antigen-bundle mvn
 
-	antigen-bundle arialdomartini/oh-my-git
-	# antigen theme arialdomartini/oh-my-git-themes arialdo-granzestyle
+	antigen bundle arialdomartini/oh-my-git
+
+	antigen-bundle seletskiy/zsh-context-aliases
 
 	case $TERM in
 		xterm*|screen*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme gnzh
 			;;
 		vt100)
 			;;
 		*)
 			antigen-bundle zsh-users/zsh-syntax-highlighting
-			antigen theme gnzh
 			;;
 	esac
 
 	antigen-bundle zsh-users/zsh-history-substring-search
+
+	# Theme
+	antigen theme gnzh
 
 	# Ruby
 	antigen-bundle ruby
 	antigen-bundle rvm
 
 	antigen-apply
-
-	# oh-my-zsh clobbers LESS :(
-	export LESS="-F -X -R"
 fi
+
+# oh-my-zsh clobbers LESS :(
+export LESS="-F -X -R"
 
 # History substring search
 zmodload zsh/terminfo
@@ -68,6 +70,14 @@ setopt nonomatch
 if [[ -x $DOTFILES/common/scripts/get-hosts ]]
 then
 	zstyle -e ':completion:*' hosts 'reply=($($DOTFILES/common/scripts/get-hosts))'
+fi
+
+# Extra processing when inside emacs
+if [[ -n "$INSIDE_EMACS" ]]
+then
+	chpwd() { print -P "\033AnSiTc %d" }
+	print -P "\033AnSiTu %n"
+	print -P "\033AnSiTc %d"
 fi
 
 # Load aliases
