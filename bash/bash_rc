@@ -7,26 +7,8 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_rc >> $HOME/.dot_log
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# Find out true location. Note that this assumes we have actually
-# been installed as ~/.zshrc!
-if [[ -z $DOTFILES ]]
-then
-	DOTFILES=$(readlink ~/.bashrc)
-	if [[ $? -eq 0 ]]
-	then
-		DOTFILES=$(dirname $DOTFILES)
-		DOTFILES=${DOTFILES%/bash}
-		# Check for a relative path which won't start with a slash
-		if [[ -n ${DOTFILES##/*} ]]
-		then
-			DOTFILES=~/$DOTFILES
-		fi
-	else
-		DOTFILES=~/.dotfiles
-	fi
-fi
-
-export DOTFILES
+# Initialise DOTFILES
+[ -f $HOME/.dot ] && . $HOME/.dot
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -112,11 +94,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -131,10 +108,10 @@ then
 fi
 
 # Snazzy GIT prompt
-if [[ -f $DOTFILES/externals/git-prompt/git-prompt.sh ]]
-then
-	. $DOTFILES/externals/git-prompt/git-prompt.sh
-fi
+# if [[ -f $DOTFILES/externals/git-prompt/git-prompt.sh ]]
+# then
+# 	. $DOTFILES/externals/git-prompt/git-prompt.sh
+# fi
 
 # Liquid Prompt
 if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
@@ -162,16 +139,6 @@ if [[ -f ~/Stuff/git-hub/share/completion.bash ]]; then
 	source ~/Stuff/git-hub/share/completion.bash
 fi
 
-# Add RVM to PATH for scripting
-if [[ -d ~/.rvm/bin ]]
-then
-	PATH=$PATH:~/.rvm/bin
-fi
-
-# Perlbrew and rvm configuration
-[[ -f ~/perl5/perlbrew/etc/bashrc ]] && source ~/perl5/perlbrew/etc/bashrc
-[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
-
 # Hostfile for completion
 HOSTFILE=$HOME/bash_hosts.txt
 
@@ -183,10 +150,13 @@ get_host_file()
 	echo "sigma-1.justonedb.com" >> $HOSTFILE
 	echo "lambda-1.justonedb.com" >> $HOSTFILE
 
-	# Add some personal hostgs
+	# Add some personal hosts
 	echo "home.conical-effort.net" >> $HOSTFILE
 	echo "ioctl.org" >> $HOSTFILE
 	echo "mono.org" >> $HOSTFILE
 }
 
-[[ ! -f $HOSTFILE ]] && get_host_file
+if [[ ! -f $HOSTFILE ]]
+then
+	get_host_file
+fi

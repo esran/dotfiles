@@ -5,6 +5,19 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
 
+# Justone variables and paths
+# Try to ensure this only gets loaded once as it adds to the
+# path. Do this by checking if 'env-check' is available. Can't
+# rely on checking environment variables as they are retained
+# when the PATH is cleared for stuff like 'tmux' sessions.
+# Do this early as it clobbers LD_LIBRARY_PATH
+which env-check > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+	if [ -f /etc/justone_profile ]; then
+		. /etc/justone_profile
+	fi
+fi
+
 #################
 # Path functions.
 #################
@@ -45,24 +58,14 @@ manpathadd() {
     fi
 }
 
-# Add RVM to PATH for scripting
-pathadd ~/.rvm/bin
-
 # Library path
 ldpathadd /usr/local/lib
 
-# Provisioning folder for RVM
-pathadd /opt/$USER/provision
-
-# Add ccache to front of path
-pathadd /usr/lib/ccache pre
-pathadd ~/local/lib/ccache pre
-
-# Locally installed stuff
-pathadd ~/local/bin pre
-ldpathadd ~/local/lib pre
-manpathadd ~/local/share/man pre
-manpathadd ~/local/man pre
+# Locally installed stuff.
+pathadd ~/install/bin pre
+ldpathadd ~/install/lib pre
+manpathadd ~/install/share/man pre
+manpathadd ~/install/man pre
 
 # Setting MANPATH at all means default man path isn't checked :(
 manpathadd /usr/share/man
@@ -80,22 +83,12 @@ fi
 # Ensure PATH and MANPATH are exported
 export PATH LD_LIBRARY_PATH MANPATH
 
-# Justone variables and paths
-# Try to ensure this only gets loaded once as it adds to the
-# path. Do this by checking if 'env-check' is available. Can't
-# rely on checking environment variables as they are retained
-# when the PATH is cleared for stuff like 'tmux' sessions.
-which env-check > /dev/null 2>&1
-if [[ $? -ne 0 ]]; then
-	if [ -f /etc/justone_profile ]; then
-		. /etc/justone_profile
-	fi
-fi
-
 # Setup test directory for PostgreSQL JustOne tests
-export PGTESTDIR=~/Test
+export PGTESTDIR=/home/local/sean/Test
 if [ ! -d $PGTESTDIR ]; then
-	mkdir $PGTESTDIR
+	if [ -d $(dirname $PGTESTDIR) ]; then
+		mkdir $PGTESTDIR
+	fi
 fi
 
 # Make
@@ -124,6 +117,30 @@ then
 			;;
 	esac
 fi
+
+# Perlbrew
+if [[ -f ~/externals/perlbrew/etc/bashrc ]]
+then
+	source ~/externals/perlbrew/etc/bashrc
+fi
+
+# Perl local::lib
+if [[ -d ~/externals/perl5 ]]
+then
+	eval `perl -I ~/externals/perl5/lib/perl5 -Mlocal::lib=~/externals/perl5`
+fi
+
+# RVM
+which rvm > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+	[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
+fi
+
+# CCACHE
+export CCACHE_DIR=~/local/ccache
+# Add ccache to front of path
+pathadd /usr/lib/ccache pre
+pathadd ~/install/lib/ccache pre
 
 # Sensible file permissions by default
 umask 022

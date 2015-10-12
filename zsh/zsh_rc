@@ -19,7 +19,6 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	antigen-bundle mvn
 
 	antigen bundle arialdomartini/oh-my-git
-
 	antigen-bundle seletskiy/zsh-context-aliases
 
 	case $TERM in
@@ -35,8 +34,9 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	antigen-bundle zsh-users/zsh-history-substring-search
 
-	# Theme
-	antigen theme gnzh
+	# Theme/Prompt
+	# antigen theme gnzh
+	antigen bundle nojhan/liquidprompt
 
 	# Ruby
 	antigen-bundle ruby

@@ -6,3 +6,5 @@ alias centos='ssh $(centosip)'
 
 # Ignore MAILER-DAEMON message
 alias from='from | tail -n +2'
+
+alias vi='vim'
