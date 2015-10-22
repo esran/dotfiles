@@ -61,6 +61,10 @@ manpathadd() {
 # Library path
 ldpathadd /usr/local/lib
 
+# Add ccache to front of path
+pathadd /usr/lib/ccache pre
+pathadd ~/install/lib/ccache pre
+
 # Locally installed stuff.
 pathadd ~/install/bin pre
 ldpathadd ~/install/lib pre
@@ -138,9 +142,6 @@ fi
 
 # CCACHE
 export CCACHE_DIR=~/local/ccache
-# Add ccache to front of path
-pathadd /usr/lib/ccache pre
-pathadd ~/install/lib/ccache pre
 
 # Sensible file permissions by default
 umask 022

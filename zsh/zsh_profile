@@ -28,7 +28,7 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 		xterm)
 			TERM=xterm-256color
 			;;
-		screen)
+		screen*)
 			TERM=screen-256color
 			;;
 		*)
