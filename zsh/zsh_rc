@@ -52,9 +52,10 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	antigen bundle zsh-users/zsh-history-substring-search
 
-	# Theme/Prompt
-	# antigen theme gnzh
+	# Liquidprompt
+	# Add prefix to set window title
 	antigen bundle nojhan/liquidprompt
+	LP_ENABLE_TITLE=1
 
 	# Ruby
 	# antigen bundle ruby
