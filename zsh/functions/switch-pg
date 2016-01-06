@@ -1,0 +1,90 @@
+# vim: set filetype=zsh :
+switch-pg () {
+	# Args
+	new_branch="$1"
+
+	# Identify current branch setup. When using switch all of these
+	# should match.
+	pg_branch=${JO_INST_PG#/opt/sean/PostgreSQL}
+	if [[ -z $pg_branch ]];
+	then
+		pg_branch=master
+	else
+		pg_branch=${pg_branch#-}
+	fi
+
+	# If no branch specified then show current selection
+	if [[ -z $new_branch ]];
+	then
+		echo "Current branch is: $pg_branch"
+		return 0
+	fi
+
+	# Check not changing to the current branch
+	if [[ "$new_branch" == "$pg_branch" ]];
+	then
+		echo "WARN: Already using branch $new_branch"
+		return 0
+	fi
+
+	# Setup new environment variables
+	if [[ "$new_branch" != "master" ]];
+	then
+		NEW_JO_INST_PG="/opt/sean/PostgreSQL-$new_branch"
+		NEW_JO_INST_JO="/opt/sean/JustOne-$new_branch"
+		NEW_JODATA="/opt/sean/postgres-data-$new_branch"
+	else
+		NEW_JO_INST_PG=/opt/sean/PostgreSQL
+		NEW_JO_INST_JO=/opt/sean/JustOne
+		NEW_JODATA=/opt/sean/postgres-data
+	fi
+
+	# Setup new PATH
+	new_path=()
+	for dir in $path;
+	do
+		if [[ "$dir" == "$JO_INST_PG/bin" ]]
+		then
+			new_path+="$NEW_JO_INST_PG/bin"
+		elif [[ "$dir" == "$JO_INST_JO/bin" ]]
+		then
+			new_path+="$NEW_JO_INST_JO/bin"
+		else
+			new_path+="$dir"
+		fi
+	done
+
+	# Fix LD_LIBRARY_PATH
+	# Fine, so long as there are no paths with spaces in
+	NEW_LD_LIBRARY_PATH=
+	for dir in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g');
+	do
+		newdir=$dir
+		if [[ "$dir" == "$JO_INST_JO/lib" ]]
+		then
+			newdir="$NEW_JO_INST_JO/lib"
+		fi
+
+		if [[ -z $NEW_LD_LIBRARY_PATH ]];
+		then
+			NEW_LD_LIBRARY_PATH="$newdir"
+		else
+			NEW_LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH:$newdir"
+		fi
+	done
+
+	# Update enviromment and path
+	JO_INST_PG=$NEW_JO_INST_PG
+	JO_INST_JO=$NEW_JO_INST_JO
+	LD_LIBRARY_PATH=$NEW_LD_LIBRARY_PATH
+	JODATA=$NEW_JODATA
+	path=($new_path)
+
+	# Update prompt
+	if [[ "$new_branch" != "master" ]]
+	then
+		prompt_tag $new_branch
+	else
+		prompt_tag
+	fi
+}

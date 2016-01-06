@@ -9,40 +9,40 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_log
 if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
-	antigen-use oh-my-zsh
+	# antigen-use oh-my-zsh
 
 	# Used by some prompts :(
-	antigen-bundle virtualenv
+	antigen bundle virtualenv
 
-	antigen-bundle git
-	antigen-bundle svn
-	antigen-bundle mvn
+	antigen bundle git
+	antigen bundle svn
+	antigen bundle mvn
 
 	antigen bundle arialdomartini/oh-my-git
-	antigen-bundle seletskiy/zsh-context-aliases
+	antigen bundle seletskiy/zsh-context-aliases
 
 	case $TERM in
 		xterm*|screen*)
-			antigen-bundle zsh-users/zsh-syntax-highlighting
+			antigen bundle zsh-users/zsh-syntax-highlighting
 			;;
 		vt100)
 			;;
 		*)
-			antigen-bundle zsh-users/zsh-syntax-highlighting
+			antigen bundle zsh-users/zsh-syntax-highlighting
 			;;
 	esac
 
-	antigen-bundle zsh-users/zsh-history-substring-search
+	antigen bundle zsh-users/zsh-history-substring-search
 
 	# Theme/Prompt
 	# antigen theme gnzh
 	antigen bundle nojhan/liquidprompt
 
 	# Ruby
-	antigen-bundle ruby
-	antigen-bundle rvm
+	antigen bundle ruby
+	antigen bundle rvm
 
-	antigen-apply
+	antigen apply
 fi
 
 # oh-my-zsh clobbers LESS :(

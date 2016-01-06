@@ -8,3 +8,5 @@ alias centos='ssh $(centosip)'
 alias from='from | tail -n +2'
 
 alias vi='vim'
+
+alias ls='ls --color=tty'
