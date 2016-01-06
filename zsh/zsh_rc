@@ -9,14 +9,32 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_log
 if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
-	# antigen-use oh-my-zsh
+	# Try out prezto instead of oh-my-zsh
+	_zdotdir_set=${+parameters[ZDOTDIR]}
+	if (( _zdotdir_set  )); then
+		_old_zdotdir=$ZDOTDIR
+	fi
+
+	antigen use prezto
+	antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
+	antigen bundle sorin-ionescu/prezto modules/editor
+	antigen bundle sorin-ionescu/prezto modules/git
+	antigen bundle sorin-ionescu/prezto modules/prompt
+
+	if (( _zdotdir_set  )); then
+		ZDOTDIR=$_old_zdotdir
+	else
+		unset ZDOTDIR
+		unset _old_zdotdir
+	fi;
+	unset _zdotdir_set
 
 	# Used by some prompts :(
-	antigen bundle virtualenv
+	# antigen bundle virtualenv
 
-	antigen bundle git
-	antigen bundle svn
-	antigen bundle mvn
+	# antigen bundle git
+	# antigen bundle svn
+	# antigen bundle mvn
 
 	antigen bundle arialdomartini/oh-my-git
 	antigen bundle seletskiy/zsh-context-aliases
@@ -36,11 +54,11 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	# Theme/Prompt
 	# antigen theme gnzh
-	antigen bundle nojhan/liquidprompt
+	# antigen bundle nojhan/liquidprompt
 
 	# Ruby
-	antigen bundle ruby
-	antigen bundle rvm
+	# antigen bundle ruby
+	# antigen bundle rvm
 
 	antigen apply
 fi
