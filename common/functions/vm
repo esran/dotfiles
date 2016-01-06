@@ -1,0 +1,43 @@
+# vim: set filetype=sh :
+vm_usage () {
+	echo "Usage: vm operation host"
+	echo "   operation = ip / start / login"
+}
+
+vm_ip () {
+	VBoxManage guestproperty enumerate "$@" | grep "Net.*V4.*IP" | sed -e 's/^.*value: \([^,]*\),.*$/\1/'
+}
+
+vm_login () {
+	ssh "$(vm_ip "$@")"
+}
+
+vm_start () {
+	VBoxHeadless --startvm "$@"
+}
+
+vm () {
+	if [[ $# != 2 ]]; then
+		vm_usage
+		return 1
+	fi
+
+	op="$1"
+	arg="$2"
+
+	case "$op" in
+		ip)
+			vm_ip "$arg"
+			;;
+		start)
+			vm_start "$arg"
+			;;
+		login)
+			vm_login "$arg"
+			;;
+		*)
+			echo "Unrecognised option '$op'"
+			vm_usage
+			return 1
+	esac
+}
