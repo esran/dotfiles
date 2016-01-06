@@ -54,7 +54,7 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	# Theme/Prompt
 	# antigen theme gnzh
-	# antigen bundle nojhan/liquidprompt
+	antigen bundle nojhan/liquidprompt
 
 	# Ruby
 	# antigen bundle ruby
