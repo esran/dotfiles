@@ -9,6 +9,13 @@ then
 	fpath=($fpath $DOTFILES/zsh/completion)
 fi
 
+# Pick up common functions
+if [[ -d $DOTFILES/common/functions ]]
+then
+	fpath+=($DOTFILES/common/functions)
+fi
+
+# Git hub completions
 if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
 	fpath=($fpath ~/Stuff/git-hub/share/zsh-completion)
 fi

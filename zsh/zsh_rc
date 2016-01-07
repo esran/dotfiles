@@ -62,6 +62,8 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# antigen bundle ruby
 	# antigen bundle rvm
 
+	antigen bundle psprint/zsh-cmd-architect
+
 	antigen apply
 fi
 
@@ -73,10 +75,20 @@ zmodload zsh/terminfo
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
 
-# Load zsh functions
+# Load common functions
+if [[ -d $DOTFILES/common/functions ]]
+then
+	fpath+=( $DOTFILES/common/functions )
+	for f in $DOTFILES/common/functions/*
+	do
+		[[ -f $f ]] && autoload $(basename $f)
+	done
+fi
+
+# Load zsh specific functions
 if [[ -d $DOTFILES/zsh/functions ]]
 then
-	fpath+=$DOTFILES/zsh/functions
+	fpath+=( $DOTFILES/zsh/functions )
 	for f in $DOTFILES/zsh/functions/*
 	do
 		[[ -f $f ]] && autoload $(basename $f)
