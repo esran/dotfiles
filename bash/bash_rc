@@ -117,6 +117,8 @@ fi
 if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
 then
 	source $DOTFILES/externals/liquidprompt/liquidprompt
+	LP_ENABLE_TITLE=1
+	prompt_tag BASH
 fi
 
 # enable programmable completion features (you don't need to enable
