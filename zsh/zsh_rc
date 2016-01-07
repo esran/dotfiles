@@ -55,6 +55,7 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# Liquidprompt
 	# Add prefix to set window title
 	antigen bundle nojhan/liquidprompt
+	prompt_tag
 	LP_ENABLE_TITLE=1
 
 	# Ruby
