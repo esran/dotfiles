@@ -41,26 +41,26 @@ switch-pg () {
 
 	# Setup new PATH
 	new_path=()
-	for dir in $path;
+	for d in $path;
 	do
-		if [[ "$dir" == "$JO_INST_PG/bin" ]]
+		if [[ "$d" == "$JO_INST_PG/bin" ]]
 		then
 			new_path+="$NEW_JO_INST_PG/bin"
-		elif [[ "$dir" == "$JO_INST_JO/bin" ]]
+		elif [[ "$d" == "$JO_INST_JO/bin" ]]
 		then
 			new_path+="$NEW_JO_INST_JO/bin"
 		else
-			new_path+="$dir"
+			new_path+="$d"
 		fi
 	done
 
 	# Fix LD_LIBRARY_PATH
 	# Fine, so long as there are no paths with spaces in
 	NEW_LD_LIBRARY_PATH=
-	for dir in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g');
+	for d in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g');
 	do
-		newdir=$dir
-		if [[ "$dir" == "$JO_INST_JO/lib" ]]
+		newdir=$d
+		if [[ "$d" == "$JO_INST_JO/lib" ]]
 		then
 			newdir="$NEW_JO_INST_JO/lib"
 		fi
