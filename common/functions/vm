@@ -41,3 +41,5 @@ vm () {
 			return 1
 	esac
 }
+
+vm "$@"
