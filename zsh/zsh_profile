@@ -36,3 +36,6 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 			;;
 	esac
 fi
+
+# History
+export HISTSIZE=4000 SAVEHIST=10000
