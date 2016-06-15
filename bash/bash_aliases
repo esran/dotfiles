@@ -1,4 +1,4 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_aliases >> $HOME/.dot_log
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_aliases >> $HOME/.dot_log
 
 # Always use X tunneling for ssh connections
 alias ssh='ssh -X'

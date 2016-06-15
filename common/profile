@@ -1,9 +1,10 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
-
-# This gets loaded as the only startup file prior to the gnome-session
-
+# vim: set ft=sh:
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
+
+# This gets loaded as the only startup file prior to the gnome-session
 
 # Justone variables and paths
 # Try to ensure this only gets loaded once as it adds to the
@@ -58,24 +59,52 @@ manpathadd() {
     fi
 }
 
+# Path add function
+# If there is a second parameter then prepend instead of append
+cdpathadd() {
+    if [ -d "$1" ] && [[ ":$CDPATH:" != *":$1:"* ]]; then
+		if [ -z "$2" ]; then
+			CDPATH="${CDPATH:+"$CDPATH:"}$1"
+		else
+			CDPATH="$1${CDPATH:+":$CDPATH"}"
+		fi
+    fi
+}
+
 # Library path
 ldpathadd /usr/local/lib
 
 # Add ccache to front of path
-pathadd /usr/lib/ccache pre
-pathadd ~/install/lib/ccache pre
+# We only want one ccache!
+if [[ -d ~/$HOSTNAME/install/lib/ccache ]]
+then
+	CCACHE_OPTS="--prepend-path=$HOME/$HOSTNAME/install/lib/ccache"
+	pathadd ~/$HOSTNAME/install/lib/ccache pre
+elif [[ -d ~/install/lib/ccache ]]
+then
+	CCACHE_OPTS="--prepend-path=$HOME/install/lib/ccache"
+	pathadd ~/install/lib/ccache pre
+else
+	CCACHE_OPTS="--prepend-path=/usr/lib/ccache"
+	pathadd /usr/lib/ccache pre
+fi
 
 # Locally installed stuff.
 pathadd ~/install/bin pre
+pathadd ~/$HOSTNAME/install/bin pre
 ldpathadd ~/install/lib pre
+ldpathadd ~/$HOSTNAME/install/lib pre
 manpathadd ~/install/share/man pre
+manpathadd ~/$HOSTNAME/install/share/man pre
 manpathadd ~/install/man pre
+manpathadd ~/$HOSTNAME/install/man pre
 
 # Setting MANPATH at all means default man path isn't checked :(
 manpathadd /usr/share/man
 
 # Always stick my bin on the front of the path
 pathadd ~/bin pre
+pathadd ~/$HOSTNAME/bin pre
 
 # git hub plugin
 if [[ -d ~/Stuff/git-hub ]]; then
@@ -88,7 +117,7 @@ fi
 export PATH LD_LIBRARY_PATH MANPATH
 
 # Setup test directory for PostgreSQL JustOne tests
-export PGTESTDIR=/home/local/sean/Test
+export PGTESTDIR=$HOME/$HOSTNAME/test
 if [ ! -d $PGTESTDIR ]; then
 	if [ -d $(dirname $PGTESTDIR) ]; then
 		mkdir $PGTESTDIR
@@ -141,7 +170,16 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # CCACHE
-export CCACHE_DIR=~/local/ccache
+[[ -d ~/local/ccache ]] && export CCACHE_DIR=~/local/ccache
+[[ -d ~/$HOSTNAME/ccache ]] && export CCACHE_DIR=~/$HOSTNAME/ccache
+
+# CDPATH
+# We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
+cdpathadd . pre
+cdpathadd ~/$HOSTNAME
+
+# LESS
+export LESS="-F -X -R"
 
 # Sensible file permissions by default
 umask 022

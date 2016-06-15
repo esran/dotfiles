@@ -1,7 +1,7 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env >> $HOME/.dot_log
-
 # Initialise DOTFILES
 [ -f $HOME/.dot ] && . $HOME/.dot
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env >> $HOME/.dot_log
 
 # Pick up completion functions
 if [[ -d $DOTFILES/zsh/completion ]]

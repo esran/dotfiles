@@ -1,7 +1,7 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
-
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
 
 # Load common profile
 [[ -f $HOME/.profile ]] && source $HOME/.profile
@@ -13,14 +13,8 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
 # such as out test scripts!
 # export LC_COLLATE="C"
 
-# Pager/Less
-export LESS="-F -X -R"
-
 # DEFAULT_USER (for agnoster prompt)
 export DEFAULT_USER=sean
-
-[ -z "$HOSTNAME" ] && HOSTNAME=$(hostname)
-export HOSTNAME
 
 # Color TERM
 if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
@@ -38,4 +32,4 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 fi
 
 # History
-export HISTSIZE=4000 SAVEHIST=10000
+export HISTSIZE=4000 SAVEHIST=10000 HISTFILE=~/.zsh_history

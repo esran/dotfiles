@@ -63,6 +63,9 @@ switch-pg () {
 		if [[ "$d" == "$JO_INST_JO/lib" ]]
 		then
 			newdir="$NEW_JO_INST_JO/lib"
+		elif [[ "$d" == "$JO_INST_PG/lib" ]]
+		then
+			newdir="$NEW_JO_INST_PG/lib"
 		fi
 
 		if [[ -z $NEW_LD_LIBRARY_PATH ]];

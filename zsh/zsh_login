@@ -1,7 +1,7 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_login >> $HOME/.dot_log
-
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_login >> $HOME/.dot_log
 
 # Runs last (after .zprofile -> .zshrc) for each shell created in the gnome-session
 

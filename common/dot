@@ -1,4 +1,8 @@
+# vim: set ft=sh:
 # NOTE: This gets sourced for both BASH and ZSH so be careful
+
+# Make sure HOSTNAME is set
+[[ ! -z $HOSTNAME ]] || export HOSTNAME=$(hostname -s)
 
 # Find out true location. Note that this assumes we have actually
 # been installed as ~/.profile!

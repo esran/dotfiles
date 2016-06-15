@@ -1,4 +1,4 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias >> $HOME/.dot_log
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias >> $HOME/.dot_log
 
 alias deb='ssh $(debip)'
 alias 14='ssh $(14ip)'
