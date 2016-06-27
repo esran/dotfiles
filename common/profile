@@ -152,15 +152,22 @@ then
 fi
 
 # Perlbrew
-if [[ -f ~/externals/perlbrew/etc/bashrc ]]
+if [[ -d ~/$HOSTNAME/perlbrew ]]
 then
-	source ~/externals/perlbrew/etc/bashrc
+	export PERLBREW_ROOT=~/$HOSTNAME/perlbrew
+	export PERLBREW_HOME=~/$HOSTNAME/.perlbrew
+
+	if [[ -f ~/$HOSTNAME/perlbrew/etc/bashrc ]]
+	then
+		export PERLBREW_HOME=~/$HOSTNAME/.perlbrew
+		source ~/$HOSTNAME/perlbrew/etc/bashrc
+	fi
 fi
 
 # Perl local::lib
-if [[ -d ~/externals/perl5 ]]
+if [[ -d ~/$HOSTNAME/perl5 ]]
 then
-	eval `perl -I ~/externals/perl5/lib/perl5 -Mlocal::lib=~/externals/perl5`
+	eval `perl -I ~/$HOSTNAME/perl5/lib/perl5 -Mlocal::lib=~/$HOSTNAME/perl5`
 fi
 
 # RVM
