@@ -70,6 +70,7 @@ if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
 then
 	source $DOTFILES/externals/liquidprompt/liquidprompt
 	LP_ENABLE_TITLE=1
+	LP_ENABLE_SVN=0
 	prompt_tag BASH
 fi
 

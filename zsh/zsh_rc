@@ -57,6 +57,7 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	antigen bundle nojhan/liquidprompt
 	prompt_tag
 	LP_ENABLE_TITLE=1
+	LP_ENABLE_SVN=0
 
 	# Ruby
 	# antigen bundle ruby
