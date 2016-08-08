@@ -1,4 +1,4 @@
-echo $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_logout >> $HOME/.dot_log
+echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_logout >> $HOME/.dot_log
 
 # ~/.bash_logout: executed by bash(1) when login shell exits.
 

@@ -83,6 +83,26 @@ switch-pg () {
 	JODATA=$NEW_JODATA
 	path=($new_path)
 
+	# Update test root
+	if [[ ! -z $PGTESTDIR ]]
+	then
+		if [[ $pg_branch == "master" ]]
+		then
+			PGTESTDIR=${PGTESTDIR}/$new_branch
+		else
+			PGTESTDIR=${PGTESTDIR%/$pg_branch}
+			if [[ $new_branch != "master" ]]
+			then
+				PGTESTDIR=${PGTESTDIR}/$new_branch
+			fi
+		fi
+
+		if [[ ! -d $PGTESTDIR ]]
+		then
+			mkdir -p "$PGTESTDIR"
+		fi
+	fi
+
 	# Update prompt
 	if [[ "$new_branch" != "master" ]]
 	then

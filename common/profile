@@ -78,14 +78,11 @@ ldpathadd /usr/local/lib
 # We only want one ccache!
 if [[ -d ~/$HOSTNAME/install/lib/ccache ]]
 then
-	CCACHE_OPTS="--prepend-path=$HOME/$HOSTNAME/install/lib/ccache"
 	pathadd ~/$HOSTNAME/install/lib/ccache pre
 elif [[ -d ~/install/lib/ccache ]]
 then
-	CCACHE_OPTS="--prepend-path=$HOME/install/lib/ccache"
 	pathadd ~/install/lib/ccache pre
 else
-	CCACHE_OPTS="--prepend-path=/usr/lib/ccache"
 	pathadd /usr/lib/ccache pre
 fi
 
@@ -179,6 +176,22 @@ fi
 # CCACHE
 [[ -d ~/local/ccache ]] && export CCACHE_DIR=~/local/ccache
 [[ -d ~/$HOSTNAME/ccache ]] && export CCACHE_DIR=~/$HOSTNAME/ccache
+
+# Find actual gcc by taking first entry for gcc that isn't
+# in one of the user's directories. We do this to avoid
+# recursion as we're also possibly using colorgcc which
+# appears on the PATH before ccache. Sadly ccache takes
+# first path entry that isn't itself, rather than next
+# path entry that isn't itself.
+for g in $(which -a gcc)
+do
+	if [[ $g =~ $USER ]]
+	then
+		continue
+	fi
+	export CCACHE_PATH=$(dirname $g)
+	break
+done
 
 # CDPATH
 # We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
