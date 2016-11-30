@@ -76,9 +76,6 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# Add prefix to set window title
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-liquidprompt >> $HOME/.dot_log
 	antigen bundle nojhan/liquidprompt
-	prompt_tag
-	LP_ENABLE_TITLE=0
-	LP_ENABLE_SVN=0
 
 	# Ruby
 	# antigen bundle ruby
@@ -89,6 +86,11 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply >> $HOME/.dot_log
 	antigen apply
+
+	# Prompt stuff, after apply
+	prompt_tag
+	LP_ENABLE_TITLE=0
+	LP_ENABLE_SVN=0
 fi
 
 echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen >> $HOME/.dot_log
