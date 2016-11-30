@@ -70,7 +70,16 @@ if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
 then
 	source $DOTFILES/externals/liquidprompt/liquidprompt
 	LP_ENABLE_TITLE=1
-	LP_ENABLE_SVN=0
+
+	case "$HOSTNAME" in
+		maine*)
+			LP_ENABLE_SVN=1
+			;;
+		*)
+			LP_ENABLE_SVN=0
+			;;
+	esac
+
 	prompt_tag BASH
 fi
 

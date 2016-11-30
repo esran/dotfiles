@@ -6,7 +6,7 @@ switch-pg () {
 	# Identify current branch setup. When using switch all of these
 	# should match.
 	pg_branch=${JO_INST_PG#/opt/sean/PostgreSQL}
-	if [[ -z $pg_branch ]];
+	if [[ -z $pg_branch ]]
 	then
 		pg_branch=master
 	else
@@ -14,21 +14,21 @@ switch-pg () {
 	fi
 
 	# If no branch specified then show current selection
-	if [[ -z $new_branch ]];
+	if [[ -z $new_branch ]]
 	then
 		echo "Current branch is: $pg_branch"
 		return 0
 	fi
 
 	# Check not changing to the current branch
-	if [[ "$new_branch" == "$pg_branch" ]];
+	if [[ "$new_branch" == "$pg_branch" ]]
 	then
 		echo "WARN: Already using branch $new_branch"
 		return 0
 	fi
 
 	# Setup new environment variables
-	if [[ "$new_branch" != "master" ]];
+	if [[ "$new_branch" != "master" ]]
 	then
 		NEW_JO_INST_PG="/opt/sean/PostgreSQL-$new_branch"
 		NEW_JO_INST_JO="/opt/sean/JustOne-$new_branch"
@@ -110,4 +110,7 @@ switch-pg () {
 	else
 		prompt_tag
 	fi
+
+	BRANCH="$new_branch"
+	cd $HOME/work/PostgreSQL/$BRANCH
 }

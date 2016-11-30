@@ -10,3 +10,7 @@ alias from='from | tail -n +2'
 alias vi='vim'
 
 alias ls='ls --color=tty'
+
+BRANCH=${BRANCH:-master}
+alias jocd='cd $HOME/work/JustOne/$BRANCH'
+alias pgcd='cd $HOME/work/PostgreSQL/$BRANCH'

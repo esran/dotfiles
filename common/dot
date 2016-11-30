@@ -4,6 +4,18 @@
 # Make sure HOSTNAME is set
 [[ ! -z $HOSTNAME ]] || export HOSTNAME=$(hostname -s)
 
+echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot >> $HOME/.dot_log
+
+# Tweak $HOME to pick up locally mounted rather than NFS mounted
+# if possible.
+if [[ -d /home/local/$LOGNAME ]]
+then
+	if [[ -e /home/local/$LOGNAME/.dot ]]
+	then
+		export HOME=/home/local/$LOGNAME
+	fi
+fi
+
 # Find out true location. Note that this assumes we have actually
 # been installed as ~/.profile!
 if [[ -z $DOTFILES ]]

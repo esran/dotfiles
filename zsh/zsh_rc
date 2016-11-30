@@ -7,38 +7,52 @@ echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_lo
 
 # Antigen
 if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen >> $HOME/.dot_log
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
-	# Try out prezto instead of oh-my-zsh
-	_zdotdir_set=${+parameters[ZDOTDIR]}
-	if (( _zdotdir_set  )); then
-		_old_zdotdir=$ZDOTDIR
-	fi
+	if $(false)
+	then
+		# Try out prezto instead of oh-my-zsh
+		_zdotdir_set=${+parameters[ZDOTDIR]}
+		if (( _zdotdir_set  )); then
+			_old_zdotdir=$ZDOTDIR
+		fi
 
-	antigen use prezto
-	antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
-	antigen bundle sorin-ionescu/prezto modules/editor
-	antigen bundle sorin-ionescu/prezto modules/git
-	antigen bundle sorin-ionescu/prezto modules/prompt
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc use-prezto >> $HOME/.dot_log
+		antigen use prezto
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-helper >> $HOME/.dot_log
+		antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-editor >> $HOME/.dot_log
+		antigen bundle sorin-ionescu/prezto modules/editor
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
+		antigen bundle sorin-ionescu/prezto modules/git
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-prompt >> $HOME/.dot_log
+		antigen bundle sorin-ionescu/prezto modules/prompt
 
-	if (( _zdotdir_set  )); then
-		ZDOTDIR=$_old_zdotdir
+		if (( _zdotdir_set  )); then
+			ZDOTDIR=$_old_zdotdir
+		else
+			unset ZDOTDIR
+			unset _old_zdotdir
+		fi;
+		unset _zdotdir_set
 	else
-		unset ZDOTDIR
-		unset _old_zdotdir
-	fi;
-	unset _zdotdir_set
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh >> $HOME/.dot_log
+		antigen use oh-my-zsh
+		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
+		antigen bundle git
+	fi
 
 	# Used by some prompts :(
 	# antigen bundle virtualenv
 
-	# antigen bundle git
 	# antigen bundle svn
 	# antigen bundle mvn
 
 	# antigen bundle arialdomartini/oh-my-git
 	# antigen bundle seletskiy/zsh-context-aliases
 
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-syntax-highlighting >> $HOME/.dot_log
 	case $TERM in
 		xterm*|screen*)
 			antigen bundle zsh-users/zsh-syntax-highlighting
@@ -50,23 +64,34 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 			;;
 	esac
 
+	# History automatic searching
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-history-substring-search >> $HOME/.dot_log
 	antigen bundle zsh-users/zsh-history-substring-search
+
+	# Extra completions
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-completions >> $HOME/.dot_log
+	antigen bundle zsh-users/zsh-completions
 
 	# Liquidprompt
 	# Add prefix to set window title
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-liquidprompt >> $HOME/.dot_log
 	antigen bundle nojhan/liquidprompt
 	prompt_tag
-	LP_ENABLE_TITLE=1
+	LP_ENABLE_TITLE=0
 	LP_ENABLE_SVN=0
 
 	# Ruby
 	# antigen bundle ruby
 	# antigen bundle rvm
 
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-cmd-architect >> $HOME/.dot_log
 	antigen bundle psprint/zsh-cmd-architect
 
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply >> $HOME/.dot_log
 	antigen apply
 fi
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen >> $HOME/.dot_log
 
 # oh-my-zsh clobbers LESS :(
 export LESS="-F -X -R"
@@ -96,6 +121,8 @@ then
 	done
 fi
 
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-functions >> $HOME/.dot_log
+
 # turn of nomatch so that stuff like -? and ^. works
 setopt nonomatch
 
@@ -104,6 +131,8 @@ if [[ -x $DOTFILES/common/scripts/get-hosts ]]
 then
 	zstyle -e ':completion:*' hosts 'reply=($($DOTFILES/common/scripts/get-hosts))'
 fi
+
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-hosts >> $HOME/.dot_log
 
 # Extra processing when inside emacs
 if [[ -n "$INSIDE_EMACS" ]]

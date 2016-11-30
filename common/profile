@@ -26,65 +26,53 @@ fi
 # Path add function
 # If there is a second parameter then prepend instead of append
 pathadd() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+	if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
 		if [ -z "$2" ]; then
 			PATH="${PATH:+"$PATH:"}$1"
 		else
 			PATH="$1${PATH:+":$PATH"}"
 		fi
-    fi
+	fi
 }
 
 # LD_LIBRARY_PATH
 # If there is a second parameter then prepend instead of append
 ldpathadd() {
-    if [ -d "$1" ] && [[ ":$LD_LIBRARY_PATH:" != *":$1:"* ]]; then
+	if [ -d "$1" ] && [[ ":$LD_LIBRARY_PATH:" != *":$1:"* ]]; then
 		if [ -z "$2" ]; then
 			LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}$1"
 		else
 			LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH:+":$LD_LIBRARY_PATH"}"
 		fi
-    fi
+	fi
 }
 
 # MANPATH
 # If there is a second parameter then prepend instead of append
 manpathadd() {
-    if [ -d "$1" ] && [[ ":$MANPATH:" != *":$1:"* ]]; then
+	if [ -d "$1" ] && [[ ":$MANPATH:" != *":$1:"* ]]; then
 		if [ -z "$2" ]; then
 			MANPATH="${MANPATH:+"$MANPATH:"}$1"
 		else
 			MANPATH="$1${MANPATH:+":$MANPATH"}"
 		fi
-    fi
+	fi
 }
 
 # Path add function
 # If there is a second parameter then prepend instead of append
 cdpathadd() {
-    if [ -d "$1" ] && [[ ":$CDPATH:" != *":$1:"* ]]; then
+	if [ -d "$1" ] && [[ ":$CDPATH:" != *":$1:"* ]]; then
 		if [ -z "$2" ]; then
 			CDPATH="${CDPATH:+"$CDPATH:"}$1"
 		else
 			CDPATH="$1${CDPATH:+":$CDPATH"}"
 		fi
-    fi
+	fi
 }
 
 # Library path
 ldpathadd /usr/local/lib
-
-# Add ccache to front of path
-# We only want one ccache!
-if [[ -d ~/$HOSTNAME/install/lib/ccache ]]
-then
-	pathadd ~/$HOSTNAME/install/lib/ccache pre
-elif [[ -d ~/install/lib/ccache ]]
-then
-	pathadd ~/install/lib/ccache pre
-else
-	pathadd /usr/lib/ccache pre
-fi
 
 # Locally installed stuff.
 pathadd ~/install/bin pre
@@ -114,12 +102,9 @@ fi
 export PATH LD_LIBRARY_PATH MANPATH
 
 # Setup test directory for PostgreSQL JustOne tests
-export PGTESTDIR=$HOME/$HOSTNAME/test
-if [ ! -d $PGTESTDIR ]; then
-	if [ -d $(dirname $PGTESTDIR) ]; then
-		mkdir $PGTESTDIR
-	fi
-fi
+# This needs to be a normalised path
+[[ -d $HOME/test ]] && export PGTESTDIR=$HOME/test
+[[ -d $HOME/$HOSTNAME/test ]] && export PGTESTDIR=$(readlink -f "$HOME/$HOSTNAME/test")
 
 # Make
 # Note the justone profile sets this, but we override it here
@@ -174,24 +159,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # CCACHE
-[[ -d ~/local/ccache ]] && export CCACHE_DIR=~/local/ccache
 [[ -d ~/$HOSTNAME/ccache ]] && export CCACHE_DIR=~/$HOSTNAME/ccache
-
-# Find actual gcc by taking first entry for gcc that isn't
-# in one of the user's directories. We do this to avoid
-# recursion as we're also possibly using colorgcc which
-# appears on the PATH before ccache. Sadly ccache takes
-# first path entry that isn't itself, rather than next
-# path entry that isn't itself.
-for g in $(which -a gcc)
-do
-	if [[ $g =~ $USER ]]
-	then
-		continue
-	fi
-	export CCACHE_PATH=$(dirname $g)
-	break
-done
 
 # CDPATH
 # We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
@@ -203,3 +171,6 @@ export LESS="-F -X -R"
 
 # Sensible file permissions by default
 umask 022
+
+# allow core files
+ulimit -c unlimited
