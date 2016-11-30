@@ -9,7 +9,7 @@ vm_ip () {
 }
 
 vm_login () {
-	ssh "$(vm_ip "$@")"
+	ssh -X "$(vm_ip "$@")"
 }
 
 vm_start () {
