@@ -12,6 +12,7 @@ if [[ -d /home/local/$LOGNAME ]]
 then
 	if [[ -e /home/local/$LOGNAME/.dot ]]
 	then
+		export ORIG_HOME=$HOME
 		export HOME=/home/local/$LOGNAME
 	fi
 fi
