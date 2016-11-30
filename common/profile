@@ -1,8 +1,8 @@
 # vim: set ft=sh:
 # Initialise DOTFILES
-[[ -f $HOME/.dot ]] && source $HOME/.dot
+[[ -f $HOME/.dot ]] && source "$HOME/.dot"
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile" >> "$HOME/.dot_log"
 
 # This gets loaded as the only startup file prior to the gnome-session
 
@@ -76,26 +76,26 @@ ldpathadd /usr/local/lib
 
 # Locally installed stuff.
 pathadd ~/install/bin pre
-pathadd ~/$HOSTNAME/install/bin pre
+pathadd "$HOME/$HOSTNAME/install/bin" pre
 ldpathadd ~/install/lib pre
-ldpathadd ~/$HOSTNAME/install/lib pre
+ldpathadd "$HOME/$HOSTNAME/install/lib" pre
 manpathadd ~/install/share/man pre
-manpathadd ~/$HOSTNAME/install/share/man pre
+manpathadd "$HOME/$HOSTNAME/install/share/man" pre
 manpathadd ~/install/man pre
-manpathadd ~/$HOSTNAME/install/man pre
+manpathadd "$HOME/$HOSTNAME/install/man" pre
 
 # Setting MANPATH at all means default man path isn't checked :(
 manpathadd /usr/share/man
 
 # Always stick my bin on the front of the path
 pathadd ~/bin pre
-pathadd ~/$HOSTNAME/bin pre
+pathadd "$HOME/$HOSTNAME/bin" pre
 
 # git hub plugin
-if [[ -d ~/Stuff/git-hub ]]; then
-	pathadd ~/Stuff/git-hub/lib
-	manpathadd ~/Stuff/git-hub/man
-	export GIT_HUB_ROOT=$HOME/Stuff/git-hub
+if [[ -d ~/stuff/git-hub ]]; then
+	pathadd ~/stuff/git-hub/lib
+	manpathadd ~/stuff/git-hub/man
+	export GIT_HUB_ROOT=$HOME/stuff/git-hub
 fi
 
 # Ensure PATH and MANPATH are exported
@@ -103,28 +103,30 @@ export PATH LD_LIBRARY_PATH MANPATH
 
 # Setup test directory for PostgreSQL JustOne tests
 # This needs to be a normalised path
-[[ -d $HOME/test ]] && export PGTESTDIR=$HOME/test
-[[ -d $HOME/$HOSTNAME/test ]] && export PGTESTDIR=$(readlink -f "$HOME/$HOSTNAME/test")
+[[ -d $HOME/test ]] && PGTESTDIR=$HOME/test
+[[ -d $HOME/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$HOME/$HOSTNAME/test")
+export PGTESTDIR
 
 # Make
 # Note the justone profile sets this, but we override it here
-export MAKEFLAGS="-j$(expr $(grep processor /proc/cpuinfo | wc -l) / 2) V=0"
+MAKEFLAGS="-j$(( $(grep -c processor /proc/cpuinfo) / 2)) V=0"
+export MAKEFLAGS
 
 # Temp folder
 export TMPDIR=/tmp/${USER:-$LOGNAME}
-[[ ! -d $TMPDIR ]] && mkdir $TMPDIR
+[[ ! -d $TMPDIR ]] && mkdir "$TMPDIR"
 
 # Setup solarized dircolors
-if [ -d $DOTFILES/externals/dircolors-solarized ]; then
-	if [ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]; then
-		eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
+if [[ -d $DOTFILES/externals/dircolors-solarized ]]; then
+	if [[ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]]; then
+		eval "$(dircolors "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light")"
 	fi
 fi
 
 # Java home
 if [[ -z $JAVA_HOME ]]
 then
-	case `hostname` in
+	case $(hostname) in
 		iowa)
 			export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
 			;;
@@ -134,37 +136,38 @@ then
 fi
 
 # Perlbrew
-if [[ -d ~/$HOSTNAME/perlbrew ]]
+if [[ -d $HOME/$HOSTNAME/perlbrew ]]
 then
-	export PERLBREW_ROOT=~/$HOSTNAME/perlbrew
-	export PERLBREW_HOME=~/$HOSTNAME/.perlbrew
+	export PERLBREW_ROOT=$HOME/$HOSTNAME/perlbrew
+	export PERLBREW_HOME=$HOME/$HOSTNAME/.perlbrew
 
 	if [[ -f ~/$HOSTNAME/perlbrew/etc/bashrc ]]
 	then
-		export PERLBREW_HOME=~/$HOSTNAME/.perlbrew
-		source ~/$HOSTNAME/perlbrew/etc/bashrc
+		export PERLBREW_HOME=$HOME/$HOSTNAME/.perlbrew
+		source "$HOME/$HOSTNAME/perlbrew/etc/bashrc"
 	fi
 fi
 
 # Perl local::lib
 if [[ -d ~/$HOSTNAME/perl5 ]]
 then
-	eval `perl -I ~/$HOSTNAME/perl5/lib/perl5 -Mlocal::lib=~/$HOSTNAME/perl5`
+	eval "$(perl -I ~/ "$HOSTNAME/perl5/lib/perl5" -Mlocal::lib="$HOME/$HOSTNAME/perl5")"
 fi
 
 # RVM
 which rvm > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
-	[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
+	[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 fi
 
 # CCACHE
+[[ -d ~/ccache ]] && export CCACHE_DIR=~/ccache
 [[ -d ~/$HOSTNAME/ccache ]] && export CCACHE_DIR=~/$HOSTNAME/ccache
 
 # CDPATH
 # We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
 cdpathadd . pre
-cdpathadd ~/$HOSTNAME
+cdpathadd "$HOME/$HOSTNAME"
 
 # LESS
 export LESS="-F -X -R"
