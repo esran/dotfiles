@@ -8,12 +8,15 @@ echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot >> $HOME/.dot_
 
 # Tweak $HOME to pick up locally mounted rather than NFS mounted
 # if possible.
-if [[ -d /home/local/$LOGNAME ]]
+if [[ -z $ORIG_HOME ]]
 then
-	if [[ -e /home/local/$LOGNAME/.dot ]]
+	if [[ -d /home/local/$LOGNAME ]]
 	then
-		export ORIG_HOME=$HOME
-		export HOME=/home/local/$LOGNAME
+		if [[ -e /home/local/$LOGNAME/.dot ]]
+		then
+			export ORIG_HOME=$HOME
+			export HOME=/home/local/$LOGNAME
+		fi
 	fi
 fi
 

@@ -88,11 +88,16 @@ manpathadd "$ORIG_HOME/$HOSTNAME/install/share/man" pre
 manpathadd ~/install/man pre
 manpathadd "$HOME/$HOSTNAME/install/man" pre
 
+# .local stuff (seems the Python way of doing things)
+pathadd ~/.local/bin pre
+ldpathadd ~/.local/lib pre
+manpathadd ~/.local/man pre
+
 # Setting MANPATH at all means default man path isn't checked :(
 manpathadd /usr/share/man
 
 # Always stick my bin on the front of the path
-pathadd $ORIG_HOME/bin pre
+pathadd "$ORIG_HOME/bin" pre
 pathadd ~/bin pre
 pathadd "$HOME/$HOSTNAME/bin" pre
 
@@ -111,6 +116,7 @@ export PATH LD_LIBRARY_PATH MANPATH
 [[ -d $HOME/test ]] && PGTESTDIR=$HOME/test
 [[ -d $HOME/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$HOME/$HOSTNAME/test")
 export PGTESTDIR
+export KEEP_DATA_DIRS=1
 
 # Make
 # Note the justone profile sets this, but we override it here

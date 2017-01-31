@@ -103,6 +103,9 @@ if [[ -f ~/Stuff/git-hub/share/completion.bash ]]; then
 	source ~/Stuff/git-hub/share/completion.bash
 fi
 
+# FZF
+[[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
+
 # Hostfile for completion
 HOSTFILE=$HOME/bash_hosts.txt
 

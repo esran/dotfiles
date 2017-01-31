@@ -10,38 +10,38 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen >> $HOME/.dot_log
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
-	if $(false)
-	then
-		# Try out prezto instead of oh-my-zsh
-		_zdotdir_set=${+parameters[ZDOTDIR]}
-		if (( _zdotdir_set  )); then
-			_old_zdotdir=$ZDOTDIR
-		fi
+	# PREZTO
+	# # Try out prezto instead of oh-my-zsh
+	# _zdotdir_set=${+parameters[ZDOTDIR]}
+	# if (( _zdotdir_set  )); then
+	# 	_old_zdotdir=$ZDOTDIR
+	# fi
+	#
+	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc use-prezto >> $HOME/.dot_log
+	# antigen use prezto
+	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-helper >> $HOME/.dot_log
+	# antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
+	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-editor >> $HOME/.dot_log
+	# antigen bundle sorin-ionescu/prezto modules/editor
+	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
+	# antigen bundle sorin-ionescu/prezto modules/git
+	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-prompt >> $HOME/.dot_log
+	# antigen bundle sorin-ionescu/prezto modules/prompt
+	#
+	# if (( _zdotdir_set  )); then
+	# 	ZDOTDIR=$_old_zdotdir
+	# else
+	# 	unset ZDOTDIR
+	# 	unset _old_zdotdir
+	# fi;
+	# unset _zdotdir_set
 
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc use-prezto >> $HOME/.dot_log
-		antigen use prezto
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-helper >> $HOME/.dot_log
-		antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-editor >> $HOME/.dot_log
-		antigen bundle sorin-ionescu/prezto modules/editor
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
-		antigen bundle sorin-ionescu/prezto modules/git
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-prompt >> $HOME/.dot_log
-		antigen bundle sorin-ionescu/prezto modules/prompt
+	# OH-MY-ZSH
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh >> $HOME/.dot_log
+	antigen use oh-my-zsh
 
-		if (( _zdotdir_set  )); then
-			ZDOTDIR=$_old_zdotdir
-		else
-			unset ZDOTDIR
-			unset _old_zdotdir
-		fi;
-		unset _zdotdir_set
-	else
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh >> $HOME/.dot_log
-		antigen use oh-my-zsh
-		echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
-		antigen bundle git
-	fi
+	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
+	antigen bundle git
 
 	# Used by some prompts :(
 	# antigen bundle virtualenv
@@ -81,9 +81,14 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# antigen bundle ruby
 	# antigen bundle rvm
 
+	# Command Architect - Ctrl-T (TODO currently keybind from fzf overrides this)
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-cmd-architect >> $HOME/.dot_log
 	antigen bundle psprint/zsh-cmd-architect
 
+	# Autoenv - per directory rc
+	antigen bundle horosgrisa/autoenv
+
+	# APPLY ANTIGEN CHANGES
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply >> $HOME/.dot_log
 	antigen apply
 
@@ -144,5 +149,30 @@ then
 	print -P "\033AnSiTc %d"
 fi
 
+# History
+# Append, but don't update in real time, only on exit.
+# This overrides the oh-my-zsh default which results in live sharing of
+# history across shells. Nasty.
+unsetopt share_history
+unsetopt inc_append_history
+setopt   append_history
+
+# FZF
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+
+# Setup the neovim_autocd, so that terminal window follows shell's directory
+chpwd_functions+=( neovim_autocd )
+
 # Load aliases
 [[ -f ~/.zsh_alias ]] && . ~/.zsh_alias
+
+# Check if we're starting in a branch directory...
+if [[ $PWD =~ /*\/work\/PostgreSQL\/*/ ]]
+then
+	branch=${${PWD#~/work/PostgreSQL/}%%/*}
+	if [[ -n $branch && $branch != "master" ]]
+	then
+		switch-pg $branch
+	fi
+	unset branch
+fi

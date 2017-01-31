@@ -1,16 +1,19 @@
 echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias >> $HOME/.dot_log
 
-alias deb='ssh $(debip)'
-alias 14='ssh $(14ip)'
-alias centos='ssh $(centosip)'
-
 # Ignore MAILER-DAEMON message
-alias from='from | tail -n +2'
+# TODO host specific :(
+# alias from='from | tail -n +2'
 
-alias vi='vim'
-
+# Default to color for ls
 alias ls='ls --color=tty'
 
+# Default to nvim for vi
+alias vi=nvim
+
+# Meld, make sure we're using system python, not our neovim virtualenv one
+alias meld='PATH=/usr/bin:$PATH command meld'
+
+# branch/worktree handling
 BRANCH=${BRANCH:-master}
 alias jocd='cd $HOME/work/JustOne/$BRANCH'
 alias pgcd='cd $HOME/work/PostgreSQL/$BRANCH'

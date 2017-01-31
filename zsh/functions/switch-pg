@@ -1,7 +1,8 @@
 # vim: set filetype=zsh :
 switch-pg () {
 	# Args
-	new_branch="$1"
+	new_branch=$1
+	no_jo=$2
 
 	# Identify current branch setup. When using switch all of these
 	# should match.
@@ -17,13 +18,6 @@ switch-pg () {
 	if [[ -z $new_branch ]]
 	then
 		echo "Current branch is: $pg_branch"
-		return 0
-	fi
-
-	# Check not changing to the current branch
-	if [[ "$new_branch" == "$pg_branch" ]]
-	then
-		echo "WARN: Already using branch $new_branch"
 		return 0
 	fi
 
@@ -46,7 +40,7 @@ switch-pg () {
 		if [[ "$d" == "$JO_INST_PG/bin" ]]
 		then
 			new_path+="$NEW_JO_INST_PG/bin"
-		elif [[ "$d" == "$JO_INST_JO/bin" ]]
+		elif [[ "$d" == "$JO_INST_JO/bin" && -z $no_jo ]]
 		then
 			new_path+="$NEW_JO_INST_JO/bin"
 		else
@@ -57,10 +51,10 @@ switch-pg () {
 	# Fix LD_LIBRARY_PATH
 	# Fine, so long as there are no paths with spaces in
 	NEW_LD_LIBRARY_PATH=
-	for d in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g');
+	for d in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g')
 	do
 		newdir=$d
-		if [[ "$d" == "$JO_INST_JO/lib" ]]
+		if [[ "$d" == "$JO_INST_JO/lib" && -z $no_jo ]]
 		then
 			newdir="$NEW_JO_INST_JO/lib"
 		elif [[ "$d" == "$JO_INST_PG/lib" ]]
@@ -78,7 +72,7 @@ switch-pg () {
 
 	# Update enviromment and path
 	JO_INST_PG=$NEW_JO_INST_PG
-	JO_INST_JO=$NEW_JO_INST_JO
+	[[ -z $no_jo ]] && JO_INST_JO=$NEW_JO_INST_JO
 	LD_LIBRARY_PATH=$NEW_LD_LIBRARY_PATH
 	JODATA=$NEW_JODATA
 	path=($new_path)
