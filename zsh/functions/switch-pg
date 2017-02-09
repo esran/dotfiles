@@ -1,8 +1,8 @@
 # vim: set filetype=zsh :
 switch-pg () {
 	# Args
-	new_branch=$1
-	no_jo=$2
+	new_pg=$1
+	new_jo=$2
 
 	# Identify current branch setup. When using switch all of these
 	# should match.
@@ -14,23 +14,85 @@ switch-pg () {
 		pg_branch=${pg_branch#-}
 	fi
 
-	# If no branch specified then show current selection
-	if [[ -z $new_branch ]]
+	jo_branch=${JO_INST_JO#/opt/sean/JustOne}
+	if [[ -z $jo_branch ]]
 	then
-		echo "Current branch is: $pg_branch"
+		jo_branch=master
+	else
+		jo_branch=${jo_branch#-}
+	fi
+
+	# If no branch specified then show current selection
+	if [[ -z $new_pg && -z $new_jo ]]
+	then
+		echo "pg=$pg_branch"
+		echo "jo=$jo_branch"
 		return 0
 	fi
 
-	# Setup new environment variables
-	if [[ "$new_branch" != "master" ]]
+	# If no branch specified then keep current branch
+	if [[ -z $new_pg ]]
 	then
-		NEW_JO_INST_PG="/opt/sean/PostgreSQL-$new_branch"
-		NEW_JO_INST_JO="/opt/sean/JustOne-$new_branch"
-		NEW_JODATA="/opt/sean/postgres-data-$new_branch"
+		new_pg=$pg_branch
+	fi
+
+	if [[ -z $new_jo ]]
+	then
+		new_jo=$new_pg
+	elif [[ "$new_jo" == "-" ]]
+	then
+		new_jo=$jo_branch
+	fi
+
+	# Check branches exist
+	if [[ ! -d ~/work/PostgreSQL/$new_pg ]]
+	then
+		echo "ERROR: pg branch does not exist: $new_pg"
+		return 1
+	fi
+
+	if [[ ! -d ~/work/JustOne/$new_jo ]]
+	then
+		# Attempt to work it out based on the postgres
+		pushd ~/work/PostgreSQL/$new_pg > /dev/null 2>&1
+		url=$(git svn info | awk '/^URL:/ { print $2 }')
+		url=${url#http://svn/PostgreSQL/}
+		if [[ $url == "trunk" && -d ~/work/JustOne/master ]]
+		then
+			new_jo=master
+		else
+			url=${url#branches/}
+			if [[ ! -z $url && -d ~/work/JustOne/$url ]]
+			then
+				new_jo=$url
+			fi
+		fi
+
+		popd > /dev/null 2>&1
+
+		if [[ ! -d ~/work/JustOne/$new_jo ]]
+		then
+			echo "ERROR: could not identify jo branch, tried: master, $url"
+			return 1
+		fi
+	fi
+
+	# Setup new postgres environment variables
+	if [[ "$new_pg" != "master" ]]
+	then
+		NEW_JO_INST_PG="/opt/sean/PostgreSQL-$new_pg"
+		NEW_JODATA="/opt/sean/postgres-data-$new_pg"
 	else
 		NEW_JO_INST_PG=/opt/sean/PostgreSQL
-		NEW_JO_INST_JO=/opt/sean/JustOne
 		NEW_JODATA=/opt/sean/postgres-data
+	fi
+
+	# Setup new justone environment variables
+	if [[ "$new_jo" != "master" ]]
+	then
+		NEW_JO_INST_JO="/opt/sean/JustOne-$new_jo"
+	else
+		NEW_JO_INST_JO="/opt/sean/JustOne"
 	fi
 
 	# Setup new PATH
@@ -40,7 +102,7 @@ switch-pg () {
 		if [[ "$d" == "$JO_INST_PG/bin" ]]
 		then
 			new_path+="$NEW_JO_INST_PG/bin"
-		elif [[ "$d" == "$JO_INST_JO/bin" && -z $no_jo ]]
+		elif [[ "$d" == "$JO_INST_JO/bin" ]]
 		then
 			new_path+="$NEW_JO_INST_JO/bin"
 		else
@@ -54,7 +116,7 @@ switch-pg () {
 	for d in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g')
 	do
 		newdir=$d
-		if [[ "$d" == "$JO_INST_JO/lib" && -z $no_jo ]]
+		if [[ "$d" == "$JO_INST_JO/lib" ]]
 		then
 			newdir="$NEW_JO_INST_JO/lib"
 		elif [[ "$d" == "$JO_INST_PG/lib" ]]
@@ -72,7 +134,7 @@ switch-pg () {
 
 	# Update enviromment and path
 	JO_INST_PG=$NEW_JO_INST_PG
-	[[ -z $no_jo ]] && JO_INST_JO=$NEW_JO_INST_JO
+	JO_INST_JO=$NEW_JO_INST_JO
 	LD_LIBRARY_PATH=$NEW_LD_LIBRARY_PATH
 	JODATA=$NEW_JODATA
 	path=($new_path)
@@ -82,15 +144,20 @@ switch-pg () {
 	then
 		if [[ $pg_branch == "master" ]]
 		then
-			PGTESTDIR=${PGTESTDIR}/$new_branch
+			# If we were on master then simply add new branch as subdir
+			PGTESTDIR=${PGTESTDIR}/$new_pg
 		else
+			# If we were not on master then remove branch
 			PGTESTDIR=${PGTESTDIR%/$pg_branch}
-			if [[ $new_branch != "master" ]]
+
+			# If new branch is not master then append it
+			if [[ $new_pg != "master" ]]
 			then
-				PGTESTDIR=${PGTESTDIR}/$new_branch
+				PGTESTDIR=${PGTESTDIR}/$new_pg
 			fi
 		fi
 
+		# Create test directory if it doesn't already exist
 		if [[ ! -d $PGTESTDIR ]]
 		then
 			mkdir -p "$PGTESTDIR"
@@ -98,13 +165,23 @@ switch-pg () {
 	fi
 
 	# Update prompt
-	if [[ "$new_branch" != "master" ]]
+	if [[ "$new_jo" != "master" ]]
 	then
-		prompt_tag $new_branch
+		prompt_tag "$new_pg/$new_jo"
+	elif [[ "$new_pg" != "master" ]]
+	then
+		prompt_tag "$new_pg"
 	else
 		prompt_tag
 	fi
 
-	BRANCH="$new_branch"
-	cd $HOME/work/PostgreSQL/$BRANCH
+	PG_BRANCH="$new_pg"
+	JO_BRANCH="$new_jo"
+
+	# If we're not in a sub directory of the new
+	# postgres then cd there
+	if [[ ! $PWD/ =~ ~/work/PostgreSQL/$PG_BRANCH/.* ]]
+	then
+		pgcd
+	fi
 }

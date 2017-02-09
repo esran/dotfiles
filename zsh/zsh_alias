@@ -14,6 +14,7 @@ alias vi=nvim
 alias meld='PATH=/usr/bin:$PATH command meld'
 
 # branch/worktree handling
-BRANCH=${BRANCH:-master}
-alias jocd='cd $HOME/work/JustOne/$BRANCH'
-alias pgcd='cd $HOME/work/PostgreSQL/$BRANCH'
+PG_BRANCH=${PG_BRANCH:-master}
+JO_BRANCH=${JO_BRANCH:-master}
+alias jocd='cd $HOME/work/JustOne/$JO_BRANCH'
+alias pgcd='cd $HOME/work/PostgreSQL/$PG_BRANCH'
