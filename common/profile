@@ -88,6 +88,10 @@ manpathadd "$ORIG_HOME/$HOSTNAME/install/share/man" pre
 manpathadd ~/install/man pre
 manpathadd "$HOME/$HOSTNAME/install/man" pre
 
+# Qt 5
+pathadd ~/stuff/qt-5.8.0/5.8/gcc_64/bin
+ldpathadd ~/stuff/qt-5.8.0/5.8/gcc_64/lib
+
 # .local stuff (seems the Python way of doing things)
 pathadd ~/.local/bin pre
 ldpathadd ~/.local/lib pre
