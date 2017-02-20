@@ -192,3 +192,6 @@ umask 022
 
 # allow core files
 ulimit -c unlimited
+
+# neovim
+export NVIM_TUI_ENABLE_CURSOR_SHAPE=0
