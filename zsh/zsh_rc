@@ -10,32 +10,6 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen >> $HOME/.dot_log
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
-	# PREZTO
-	# # Try out prezto instead of oh-my-zsh
-	# _zdotdir_set=${+parameters[ZDOTDIR]}
-	# if (( _zdotdir_set  )); then
-	# 	_old_zdotdir=$ZDOTDIR
-	# fi
-	#
-	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc use-prezto >> $HOME/.dot_log
-	# antigen use prezto
-	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-helper >> $HOME/.dot_log
-	# antigen bundle sorin-ionescu/prezto modules/helper  # required for Git module
-	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-editor >> $HOME/.dot_log
-	# antigen bundle sorin-ionescu/prezto modules/editor
-	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
-	# antigen bundle sorin-ionescu/prezto modules/git
-	# echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-prompt >> $HOME/.dot_log
-	# antigen bundle sorin-ionescu/prezto modules/prompt
-	#
-	# if (( _zdotdir_set  )); then
-	# 	ZDOTDIR=$_old_zdotdir
-	# else
-	# 	unset ZDOTDIR
-	# 	unset _old_zdotdir
-	# fi;
-	# unset _zdotdir_set
-
 	# OH-MY-ZSH
 	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh >> $HOME/.dot_log
 	antigen use oh-my-zsh
@@ -94,8 +68,6 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 
 	# Prompt stuff, after apply
 	prompt_tag
-	LP_ENABLE_TITLE=0
-	LP_ENABLE_SVN=0
 fi
 
 echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen >> $HOME/.dot_log
@@ -165,6 +137,9 @@ chpwd_functions+=( neovim_autocd )
 
 # Load aliases
 [[ -f ~/.zsh_alias ]] && . ~/.zsh_alias
+
+# Liquidprompt configuration
+[[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
 
 # Check if we're starting in a branch directory...
 if [[ $PWD =~ /*\/work\/PostgreSQL\/*/ ]]

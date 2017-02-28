@@ -167,10 +167,10 @@ switch-pg () {
 	# Update prompt
 	if [[ "$new_jo" != "master" ]]
 	then
-		prompt_tag "$new_pg/$new_jo"
+		prompt_tag "[$new_pg/$new_jo]"
 	elif [[ "$new_pg" != "master" ]]
 	then
-		prompt_tag "$new_pg"
+		prompt_tag "[$new_pg]"
 	else
 		prompt_tag
 	fi

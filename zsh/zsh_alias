@@ -8,7 +8,12 @@ echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias >> $HOME/.dot
 alias ls='ls --color=tty'
 
 # Default to nvim for vi
-alias vi=nvim
+if $(which -a nvim > /dev/null 2>&1)
+then	
+	alias vi=nvim
+else
+	alias vi=vim
+fi
 
 # Meld, make sure we're using system python, not our neovim virtualenv one
 alias meld='PATH=/usr/bin:$PATH command meld'

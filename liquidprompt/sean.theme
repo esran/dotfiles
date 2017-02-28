@@ -1,0 +1,6 @@
+
+
+# Nice bold prompt
+LP_COLOR_MARK="${BOLD}"
+
+# vim: set et sts=4 sw=4 tw=120 ft=sh:

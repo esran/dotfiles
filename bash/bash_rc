@@ -1,8 +1,8 @@
 # vim: set ft=sh:
 # Initialise DOTFILES
-[ -f $HOME/.dot ] && . $HOME/.dot
+[ -f "$HOME/.dot" ] && . "$HOME/.dot"
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_rc >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_rc" >> "$HOME/.dot_log"
 
 # If not running interactively, don't do anything
 [[ -z $PS1 ]] && return
@@ -105,6 +105,9 @@ fi
 
 # FZF
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
+
+# Liquidprompt configuration
+[[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
 
 # Hostfile for completion
 HOSTFILE=$HOME/bash_hosts.txt
