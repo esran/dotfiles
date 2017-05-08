@@ -55,17 +55,22 @@ switch-pg () {
 	then
 		# Attempt to work it out based on the postgres
 		pushd ~/work/PostgreSQL/$new_pg > /dev/null 2>&1
-		url=$(git svn info | awk '/^URL:/ { print $2 }')
-		url=${url#http://svn/PostgreSQL/}
-		if [[ $url == "trunk" && -d ~/work/JustOne/master ]]
+		if [[ -d .git/svn/refs ]]
 		then
-			new_jo=master
-		else
-			url=${url#branches/}
-			if [[ ! -z $url && -d ~/work/JustOne/$url ]]
+			url=$(git svn info | awk '/^URL:/ { print $2 }')
+			url=${url#http://svn/PostgreSQL/}
+			if [[ $url == "trunk" && -d ~/work/JustOne/master ]]
 			then
-				new_jo=$url
+				new_jo=master
+			else
+				url=${url#branches/}
+				if [[ ! -z $url && -d ~/work/JustOne/$url ]]
+				then
+					new_jo=$url
+				fi
 			fi
+		else
+			new_jo=master
 		fi
 
 		popd > /dev/null 2>&1
@@ -185,3 +190,5 @@ switch-pg () {
 		pgcd
 	fi
 }
+
+switch-pg "$@"

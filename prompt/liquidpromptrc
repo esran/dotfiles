@@ -1,7 +1,11 @@
-# Initialise DOTFILES
-[[ -f $HOME/.dot ]] && source $HOME/.dot
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC1090
+# vim: set et sts=4 sw=4 tw=120 ft=sh:
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID prompt/liquidpromptrc >> $HOME/.dot_log
+# Initialise DOTFILES
+[[ -f $HOME/.dot ]] && source "$HOME/.dot"
+
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID prompt/liquidpromptrc" >> "$HOME/.dot_log"
 
 
 ####################################
@@ -127,7 +131,7 @@ LP_ENABLE_TIME=1
 
 # Show runtime of the previous command if over LP_RUNTIME_THRESHOLD
 # Recommended value is 0
-LP_ENABLE_RUNTIME=0
+LP_ENABLE_RUNTIME=1
 
 # Minimal runtime (in seconds) before the runtime will be displayed
 # Recommended value is 2
@@ -178,4 +182,3 @@ LP_ENABLE_TITLE=0
 # Disable SVN as it is too slow
 LP_ENABLE_SVN=0
 
-# vim: set et sts=4 sw=4 tw=120 ft=sh:

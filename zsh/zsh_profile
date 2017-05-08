@@ -1,7 +1,8 @@
+# vim: set ft=zsh:
+echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
+
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source $HOME/.dot
-
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
 
 # Load common profile
 [[ -f $HOME/.profile ]] && source $HOME/.profile

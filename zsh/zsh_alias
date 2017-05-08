@@ -1,3 +1,4 @@
+# vim: set ft=zsh:
 echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias >> $HOME/.dot_log
 
 # Ignore MAILER-DAEMON message
@@ -23,3 +24,13 @@ PG_BRANCH=${PG_BRANCH:-master}
 JO_BRANCH=${JO_BRANCH:-master}
 alias jocd='cd $HOME/work/JustOne/$JO_BRANCH'
 alias pgcd='cd $HOME/work/PostgreSQL/$PG_BRANCH'
+
+# Ninja
+if [[ ! -z $MAX_JOBS && ! -z $MAX_LOAD ]]
+then
+	alias ninja='ninja -j$MAX_JOBS -l$MAX_LOAD'
+fi
+
+# various ls aliases
+alias lsf='ls *(.)'
+alias lsd='ls -d *(/)'

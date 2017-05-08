@@ -4,7 +4,11 @@
 # Make sure HOSTNAME is set
 [[ ! -z $HOSTNAME ]] || export HOSTNAME=$(hostname -s)
 
-echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot >> $HOME/.dot_log
+if [[ -z $_DOT ]]
+then
+	echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot >> $HOME/.dot_log
+	_DOT=1
+fi
 
 # Tweak $HOME to pick up locally mounted rather than NFS mounted
 # if possible.

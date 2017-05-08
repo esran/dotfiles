@@ -1,20 +1,24 @@
-# Initialise DOTFILES
-[[ -f $HOME/.dot ]] && source $HOME/.dot
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=1090
+# vim: set ft=zsh:
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc >> $HOME/.dot_log
+# Initialise DOTFILES
+[[ -f ~/.dot ]] && source ~/.dot
 
 # Runs second (after .zprofile) for each shell created in the gnome-session
 
 # Antigen
-if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen >> $HOME/.dot_log
+if [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen" >> ~/.dot_log
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
 	# OH-MY-ZSH
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc oh-my-zsh" >> ~/.dot_log
 	antigen use oh-my-zsh
 
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-git" >> ~/.dot_log
 	antigen bundle git
 
 	# Used by some prompts :(
@@ -26,7 +30,7 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# antigen bundle arialdomartini/oh-my-git
 	# antigen bundle seletskiy/zsh-context-aliases
 
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-syntax-highlighting >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-syntax-highlighting" >> ~/.dot_log
 	case $TERM in
 		xterm*|screen*)
 			antigen bundle zsh-users/zsh-syntax-highlighting
@@ -39,16 +43,16 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	esac
 
 	# History automatic searching
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-history-substring-search >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-history-substring-search" >> ~/.dot_log
 	antigen bundle zsh-users/zsh-history-substring-search
 
 	# Extra completions
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-completions >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-completions" >> ~/.dot_log
 	antigen bundle zsh-users/zsh-completions
 
 	# Liquidprompt
 	# Add prefix to set window title
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-liquidprompt >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-liquidprompt" >> ~/.dot_log
 	antigen bundle nojhan/liquidprompt
 
 	# Ruby
@@ -56,27 +60,28 @@ if [ -f $DOTFILES/externals/antigen/antigen.zsh ]; then
 	# antigen bundle rvm
 
 	# Command Architect - Ctrl-T (TODO currently keybind from fzf overrides this)
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-cmd-architect >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-zsh-cmd-architect" >> ~/.dot_log
 	antigen bundle psprint/zsh-cmd-architect
 
 	# Autoenv - per directory rc
 	antigen bundle horosgrisa/autoenv
 
 	# APPLY ANTIGEN CHANGES
-	echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply" >> ~/.dot_log
 	antigen apply
 
 	# Prompt stuff, after apply
 	prompt_tag
 fi
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen" >> ~/.dot_log
 
 # oh-my-zsh clobbers LESS :(
 export LESS="-F -X -R"
 
 # History substring search
 zmodload zsh/terminfo
+# shellcheck disable=2154
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
 
@@ -86,7 +91,7 @@ then
 	fpath+=( $DOTFILES/common/functions )
 	for f in $DOTFILES/common/functions/*
 	do
-		[[ -f $f ]] && autoload $(basename $f)
+		[[ -f $f ]] && autoload "$(basename "$f")"
 	done
 fi
 
@@ -96,11 +101,11 @@ then
 	fpath+=( $DOTFILES/zsh/functions )
 	for f in $DOTFILES/zsh/functions/*
 	do
-		[[ -f $f ]] && autoload $(basename $f)
+		[[ -f $f ]] && autoload "$(basename "$f")"
 	done
 fi
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-functions >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-functions" >> ~/.dot_log
 
 # turn of nomatch so that stuff like -? and ^. works
 setopt nonomatch
@@ -108,15 +113,18 @@ setopt nonomatch
 # Use dig script to get hosts for completion
 if [[ -x $DOTFILES/common/scripts/get-hosts ]]
 then
-	zstyle -e ':completion:*' hosts 'reply=($($DOTFILES/common/scripts/get-hosts))'
+	# shellcheck disable=SC2016
+	zstyle -e ':completion:*' hosts 'reply=($("$DOTFILES/common/scripts/get-hosts"))'
 fi
 
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-hosts >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-hosts" >> ~/.dot_log
 
 # Extra processing when inside emacs
 if [[ -n "$INSIDE_EMACS" ]]
 then
-	chpwd() { print -P "\033AnSiTc %d" }
+	chpwd() {
+		print -P "\033AnSiTc %d"
+	}
 	print -P "\033AnSiTu %n"
 	print -P "\033AnSiTc %d"
 fi
@@ -132,6 +140,14 @@ setopt   append_history
 # FZF
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
+# Use ripgrep for fzf if possible
+if which rg > /dev/null 2>&1
+then
+	export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+	# shellcheck disable=SC2016
+	bindkey -s "\\C-p" '$vim $(fzf);'
+fi
+
 # Setup the neovim_autocd, so that terminal window follows shell's directory
 chpwd_functions+=( neovim_autocd )
 
@@ -142,12 +158,13 @@ chpwd_functions+=( neovim_autocd )
 [[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
 
 # Check if we're starting in a branch directory...
+# shellcheck disable=SC1001
 if [[ $PWD =~ /*\/work\/PostgreSQL\/*/ ]]
 then
 	branch=${${PWD#~/work/PostgreSQL/}%%/*}
 	if [[ -n $branch && $branch != "master" ]]
 	then
-		switch-pg $branch
+		switch-pg "$branch"
 	fi
 	unset branch
 fi
