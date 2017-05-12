@@ -1,0 +1,18 @@
+# shellcheck shell=bash
+# vim: set ft=sh:
+# 
+make () {
+	local cmd=
+	local args=
+
+	# check for ninja by preference
+	if [[ -f build.ninja ]]
+	then
+		cmd=ninja
+		args=( $NINJAFLAGS )
+	else
+		cmd=make
+	fi
+
+	command $cmd "${args[@]}" "$@"
+}

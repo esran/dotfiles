@@ -1,4 +1,6 @@
-# vim: set filetype=zsh :
+# shellcheck shell=bash
+# vim: set ft=sh:
+# 
 switch-pg () {
 	# Args
 	new_pg=$1
@@ -43,6 +45,10 @@ switch-pg () {
 	then
 		new_jo=$jo_branch
 	fi
+
+	# debug
+	# printf "%80.80s -> %-80.80s\n" "$pg_branch" "$new_jo"
+	# printf "%80.80s -> %-80.80s\n" "$jo_branch" "$new_jo"
 
 	# Check branches exist
 	if [[ ! -d ~/work/PostgreSQL/$new_pg ]]
@@ -100,25 +106,36 @@ switch-pg () {
 		NEW_JO_INST_JO="/opt/sean/JustOne"
 	fi
 
+	# debug
+	# printf "%80.80s -> %-80.80s\n" "$JO_INST_PG" "$NEW_JO_INST_PG"
+	# printf "%80.80s -> %-80.80s\n" "$JO_INST_JO" "$NEW_JO_INST_JO"
+
 	# Setup new PATH
-	new_path=()
-	for d in $path;
+	# TODO This won't work if there are spaces anywhere
+	NEW_PATH=
+	for d in ${PATH//:/ }
 	do
+		newdir=$d
 		if [[ "$d" == "$JO_INST_PG/bin" ]]
 		then
-			new_path+="$NEW_JO_INST_PG/bin"
+			newdir="$NEW_JO_INST_PG/bin"
 		elif [[ "$d" == "$JO_INST_JO/bin" ]]
 		then
-			new_path+="$NEW_JO_INST_JO/bin"
+			newdir="$NEW_JO_INST_JO/bin"
+		fi
+
+		if [[ -z $NEW_PATH ]];
+		then
+			NEW_PATH="$newdir"
 		else
-			new_path+="$d"
+			NEW_PATH="${NEW_PATH}:$newdir"
 		fi
 	done
 
 	# Fix LD_LIBRARY_PATH
-	# Fine, so long as there are no paths with spaces in
+	# TODO Fine, so long as there are no paths with spaces in
 	NEW_LD_LIBRARY_PATH=
-	for d in $(echo "$LD_LIBRARY_PATH" | sed 's/:/ /g')
+	for d in ${LD_LIBRARY_PATH//:/ }
 	do
 		newdir=$d
 		if [[ "$d" == "$JO_INST_JO/lib" ]]
@@ -137,12 +154,26 @@ switch-pg () {
 		fi
 	done
 
+	# debug
+	# # shellcheck disable=SC2086,SC2116
+	# orig_path=( $(echo ${PATH//:/ }) )
+	# # shellcheck disable=SC2086,SC2116
+	# new_path=( $(echo ${NEW_PATH//:/ }) )
+	# i=0
+	# while [[ $i -lt ${#orig_path[@]} ]]
+	# do
+	# 	(( i++ ))
+	# 	printf "%80.80s -> %-80.80s\n" "${orig_path[$i]}" "${new_path[$i]}"
+	# done
+
 	# Update enviromment and path
 	JO_INST_PG=$NEW_JO_INST_PG
 	JO_INST_JO=$NEW_JO_INST_JO
-	LD_LIBRARY_PATH=$NEW_LD_LIBRARY_PATH
+	LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH"
+	PATH="$NEW_PATH"
 	JODATA=$NEW_JODATA
-	path=($new_path)
+
+	export JO_INST_PG JO_INST_JO LD_LIBRARY_PATH JODATA PATH
 
 	# Update test root
 	if [[ ! -z $PGTESTDIR ]]
@@ -183,6 +214,8 @@ switch-pg () {
 	PG_BRANCH="$new_pg"
 	JO_BRANCH="$new_jo"
 
+	export PG_BRANCH JO_BRANCH
+
 	# If we're not in a sub directory of the new
 	# postgres then cd there
 	if [[ ! $PWD/ =~ ~/work/PostgreSQL/$PG_BRANCH/.* ]]
@@ -190,5 +223,3 @@ switch-pg () {
 		pgcd
 	fi
 }
-
-switch-pg "$@"

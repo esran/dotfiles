@@ -13,4 +13,5 @@ bash/bash_logout		.bash_logout
 bash/bash_profile		.bash_profile
 bash/bash_rc			.bashrc
 tmux/tmux.conf			.tmux.conf
-prompt/liquidpromptrc	.liquitpromptrc
+prompt/liquidpromptrc	.liquidpromptrc
+common/inputrc			.inputrc

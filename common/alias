@@ -1,0 +1,36 @@
+# shellcheck shell=bash
+# vim: set ft=sh:
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias" >> "$HOME/.dot_log"
+
+# Ignore MAILER-DAEMON message
+# TODO host specific :(
+# alias from='from | tail -n +2'
+
+# Default to color for ls
+alias ls='ls --color=tty'
+
+# Default to nvim for vi
+if which -a nvim > /dev/null 2>&1
+then	
+	alias vi=nvim
+elif which -a vim > /dev/null 2>&1
+then
+	alias vi=vim
+else
+	unalias vi
+fi
+
+# Meld, make sure we're using system python, not our neovim virtualenv one
+# alias meld='PATH=/usr/bin:$PATH command meld'
+
+# branch/worktree handling
+PG_BRANCH=${PG_BRANCH:-master}
+JO_BRANCH=${JO_BRANCH:-master}
+alias jocd='cd $HOME/work/JustOne/$JO_BRANCH'
+alias pgcd='cd $HOME/work/PostgreSQL/$PG_BRANCH'
+
+# Ninja
+if [[ ! -z $MAX_JOBS && ! -z $MAX_LOAD ]]
+then
+	alias ninja='ninja -j$MAX_JOBS -l$MAX_LOAD'
+fi

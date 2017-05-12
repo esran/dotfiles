@@ -1,4 +1,5 @@
-# vim: set ft=zsh:
+# shellcheck shell=bash
+# vim: set ft=sh:
 echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
 
 # Initialise DOTFILES

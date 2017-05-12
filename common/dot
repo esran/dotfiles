@@ -1,12 +1,14 @@
+# shellcheck shell=bash
 # vim: set ft=sh:
 # NOTE: This gets sourced for both BASH and ZSH so be careful
 
 # Make sure HOSTNAME is set
-[[ ! -z $HOSTNAME ]] || export HOSTNAME=$(hostname -s)
+[[ ! -z $HOSTNAME ]] || HOSTNAME=$(hostname -s)
+export HOSTNAME
 
 if [[ -z $_DOT ]]
 then
-	echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot >> $HOME/.dot_log
+	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot" >> "$HOME/.dot_log"
 	_DOT=1
 fi
 
@@ -31,7 +33,7 @@ then
 	DOTFILES=$(readlink ~/.dot)
 	if [[ $? -eq 0 ]]
 	then
-		DOTFILES=$(dirname $DOTFILES)
+		DOTFILES=$(dirname "$DOTFILES")
 		DOTFILES=${DOTFILES%/common}
 		# Check for a relative path which won't start with a slash
 		if [[ -n ${DOTFILES##/*} ]]

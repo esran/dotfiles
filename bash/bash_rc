@@ -1,4 +1,6 @@
-# vim: set ft=bash syn=sh:
+# shellcheck shell=bash
+# shellcheck disable=1090,1091
+# vim: set ft=sh:
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_rc" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
@@ -39,9 +41,9 @@ fi
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
 	# Setup solarized dircolors
-	if [ -d $DOTFILES/externals/dircolors-solarized ]; then
-		if [ -f $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light ]; then
-			eval `dircolors $DOTFILES/externals/dircolors-solarized/dircolors.ansi-light`
+	if [ -d "$DOTFILES/externals/dircolors-solarized" ]; then
+		if [ -f "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light" ]; then
+			eval "$( dircolors "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light" )"
 		fi
 	fi
 
@@ -65,13 +67,18 @@ then
     . ~/.bash_aliases
 fi
 
+# Common aliases
+if [[ -f $DOTFILES/common/alias ]]
+then
+	. "$DOTFILES/common/alias"
+fi
+
 # Liquidprompt configuration
-[[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
+[[ -f ~/.liquidpromptrc ]] && . ~/.liquidpromptrc
 
 # Liquid Prompt
 if [[ -f $DOTFILES/externals/liquidprompt/liquidprompt ]]
 then
-	source $DOTFILES/externals/liquidprompt/liquidprompt
 	LP_ENABLE_TITLE=1
 
 	case "$HOSTNAME" in
@@ -83,6 +90,9 @@ then
 			;;
 	esac
 
+	export LP_ENABLE_TITLE LP_ENABLE_SVN
+
+	source "$DOTFILES/externals/liquidprompt/liquidprompt"
 	prompt_tag BASH
 fi
 
@@ -95,10 +105,22 @@ then
 fi
 
 # Functions
-# TODO: separate these out as separate files, like zsh?
-if [[ -f ~/.bash_functions ]]
+# Load common functions
+if [[ -d $DOTFILES/common/functions ]]
 then
-	source ~/.bash_functions
+	for f in $DOTFILES/common/functions/*
+	do
+		[[ -f $f ]] && source "$f"
+	done
+fi
+
+# Load bash specific functions
+if [[ -d $DOTFILES/bash/functions ]]
+then
+	for f in $DOTFILES/bash/functions/*
+	do
+		[[ -f $f ]] && source "$f"
+	done
 fi
 
 # git hub completion
@@ -114,16 +136,18 @@ HOSTFILE=$HOME/bash_hosts.txt
 
 get_host_file()
 {
-	dig intranet. axfr | awk '/IN\tA\t/ {sub(".intranet.", "", $1); print $1}' > $HOSTFILE
+	dig intranet. axfr | awk '/IN\tA\t/ {sub(".intranet.", "", $1); print $1}' > "$HOSTFILE"
 
 	# Add any cloud hosts
-	echo "sigma-1.justonedb.com" >> $HOSTFILE
-	echo "lambda-1.justonedb.com" >> $HOSTFILE
+	{
+		echo "sigma-1.justonedb.com"
+		echo "lambda-1.justonedb.com"
 
-	# Add some personal hosts
-	echo "home.conical-effort.net" >> $HOSTFILE
-	echo "ioctl.org" >> $HOSTFILE
-	echo "mono.org" >> $HOSTFILE
+		# Add some personal hosts
+		echo "home.conical-effort.net"
+		echo "ioctl.org"
+		echo "mono.org"
+	} >> "$HOSTFILE"
 }
 
 if [[ ! -f $HOSTFILE ]]

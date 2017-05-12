@@ -1,8 +1,10 @@
+# shellcheck shell=bash
+# shellcheck disable=1090,1091
 # vim: set ft=sh:
-echo "$HOSTNAME" $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_profile >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_profile" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
-[ -f $HOME/.dot ] && . $HOME/.dot
+[[ -f "$HOME/.dot" ]] && . "$HOME/.dot"
 
 # NFS/Xauth fix
 if [[ -n $SSH_CLIENT ]]
@@ -11,10 +13,7 @@ then
 fi
 
 # Load common profile
-[ -f $HOME/.profile ] && . $HOME/.profile
-
-# Update window title on prompt
-PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+[[ -f $HOME/.profile ]] && . "$HOME/.profile"
 
 umask 022
 

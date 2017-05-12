@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # shellcheck shell=bash
 # shellcheck disable=1090
 # vim: set ft=zsh:
@@ -153,6 +152,9 @@ chpwd_functions+=( neovim_autocd )
 
 # Load aliases
 [[ -f ~/.zsh_alias ]] && . ~/.zsh_alias
+
+# Common aliases
+[[ -f $DOTFILES/common/alias ]] && . "$DOTFILES/common/alias"
 
 # Liquidprompt configuration
 [[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc

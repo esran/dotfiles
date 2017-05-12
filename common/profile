@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# vim: set ft=sh:
+# shellcheck shell=bash
+# shellcheck disable=SC1090,SC1091
 
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile" >> "$HOME/.dot_log"
 
@@ -137,6 +137,7 @@ export MAKEFLAGS
 
 # Ninja
 export NINJA_STATUS="[%f/%t] [%r/%o/%p] "
+export NINJAFLAGS="-j$MAX_JOBS -l$MAX_LOAD"
 
 # Temp folder
 export TMPDIR=/tmp/${USER:-$LOGNAME}

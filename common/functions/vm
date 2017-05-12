@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # vim: set filetype=sh :
 vm_usage () {
 	echo "Usage: vm operation host"
@@ -41,5 +42,3 @@ vm () {
 			return 1
 	esac
 }
-
-vm "$@"
