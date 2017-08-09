@@ -8,7 +8,6 @@ zsh/zsh_profile			.zprofile
 zsh/zsh_rc				.zshrc
 bash/bash_aliases		.bash_aliases
 bash/bash_completion	.bash_completion
-bash/bash_functions		.bash_functions
 bash/bash_logout		.bash_logout
 bash/bash_profile		.bash_profile
 bash/bash_rc			.bashrc

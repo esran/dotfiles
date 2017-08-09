@@ -2,17 +2,13 @@
 # vim: set ft=sh:
 # 
 make () {
-	local cmd=
-	local args=
-
 	# check for ninja by preference
 	if [[ -f build.ninja ]]
 	then
-		cmd=ninja
-		args=( $NINJAFLAGS )
+		# shellcheck disable=SC2086,SC2116
+		args=( $(echo $NINJAFLAGS) )
+		command ninja "${args[@]}" "$@"
 	else
-		cmd=make
+		command make "$@"
 	fi
-
-	command $cmd "${args[@]}" "$@"
 }

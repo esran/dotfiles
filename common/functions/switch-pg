@@ -2,6 +2,8 @@
 # vim: set ft=sh:
 # 
 switch-pg () {
+	echo "switch-pg " "$@"
+
 	# Args
 	new_pg=$1
 	new_jo=$2
@@ -45,10 +47,6 @@ switch-pg () {
 	then
 		new_jo=$jo_branch
 	fi
-
-	# debug
-	# printf "%80.80s -> %-80.80s\n" "$pg_branch" "$new_jo"
-	# printf "%80.80s -> %-80.80s\n" "$jo_branch" "$new_jo"
 
 	# Check branches exist
 	if [[ ! -d ~/work/PostgreSQL/$new_pg ]]
@@ -106,14 +104,11 @@ switch-pg () {
 		NEW_JO_INST_JO="/opt/sean/JustOne"
 	fi
 
-	# debug
-	# printf "%80.80s -> %-80.80s\n" "$JO_INST_PG" "$NEW_JO_INST_PG"
-	# printf "%80.80s -> %-80.80s\n" "$JO_INST_JO" "$NEW_JO_INST_JO"
-
 	# Setup new PATH
 	# TODO This won't work if there are spaces anywhere
 	NEW_PATH=
-	for d in ${PATH//:/ }
+	# shellcheck disable=SC2001,SC2086
+	for d in $(echo $PATH | sed 's/:/ /g')
 	do
 		newdir=$d
 		if [[ "$d" == "$JO_INST_PG/bin" ]]
@@ -135,7 +130,8 @@ switch-pg () {
 	# Fix LD_LIBRARY_PATH
 	# TODO Fine, so long as there are no paths with spaces in
 	NEW_LD_LIBRARY_PATH=
-	for d in ${LD_LIBRARY_PATH//:/ }
+	# shellcheck disable=SC2001,SC2086
+	for d in $(echo $LD_LIBRARY_PATH | sed 's/:/ /g')
 	do
 		newdir=$d
 		if [[ "$d" == "$JO_INST_JO/lib" ]]
@@ -146,25 +142,13 @@ switch-pg () {
 			newdir="$NEW_JO_INST_PG/lib"
 		fi
 
-		if [[ -z $NEW_LD_LIBRARY_PATH ]];
+		if [[ -z $NEW_LD_LIBRARY_PATH ]]
 		then
 			NEW_LD_LIBRARY_PATH="$newdir"
 		else
-			NEW_LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH:$newdir"
+			NEW_LD_LIBRARY_PATH="${NEW_LD_LIBRARY_PATH}:$newdir"
 		fi
 	done
-
-	# debug
-	# # shellcheck disable=SC2086,SC2116
-	# orig_path=( $(echo ${PATH//:/ }) )
-	# # shellcheck disable=SC2086,SC2116
-	# new_path=( $(echo ${NEW_PATH//:/ }) )
-	# i=0
-	# while [[ $i -lt ${#orig_path[@]} ]]
-	# do
-	# 	(( i++ ))
-	# 	printf "%80.80s -> %-80.80s\n" "${orig_path[$i]}" "${new_path[$i]}"
-	# done
 
 	# Update enviromment and path
 	JO_INST_PG=$NEW_JO_INST_PG
@@ -172,8 +156,10 @@ switch-pg () {
 	LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH"
 	PATH="$NEW_PATH"
 	JODATA=$NEW_JODATA
+	PGDATA=$JODATA
+	PGPORT=$JOPORT
 
-	export JO_INST_PG JO_INST_JO LD_LIBRARY_PATH JODATA PATH
+	export JO_INST_PG JO_INST_JO LD_LIBRARY_PATH JODATA PATH PGDATA PGPORT
 
 	# Update test root
 	if [[ ! -z $PGTESTDIR ]]
@@ -223,3 +209,9 @@ switch-pg () {
 		pgcd
 	fi
 }
+
+# ZSH lazily loads so we want to run the function when it is first loaded
+if [[ -n "$ZSH_VERSION" ]]
+then
+	switch-pg "$@"
+fi
