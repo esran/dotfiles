@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # shellcheck disable=SC1090,SC1091
+# vim: se syn=sh:
 
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile" >> "$HOME/.dot_log"
 
@@ -123,10 +124,16 @@ export PATH LD_LIBRARY_PATH MANPATH
 
 # Setup test directory for PostgreSQL JustOne tests
 # This needs to be a normalised path
-[[ -d $HOME/test ]] && PGTESTDIR=$HOME/test
-[[ -d $HOME/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$HOME/$HOSTNAME/test")
+PGTESTROOT=$HOME
+[[ -d /run/shm ]] && PGTESTROOT=/run/shm/sean
+[[ ! -d $PGTESTROOT ]] && mkdir "$PGTESTROOT"
+[[ -d $PGTESTROOT/test ]] && PGTESTDIR=$PGTESTROOT/test/master
+[[ -d $PGTESTROOT/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$PGTESTROOT/$HOSTNAME/test/master")
+[[ -z $PGTESTDIR ]] && PGTESTDIR=$PGTESTROOT/test/master
+[[ ! -d $PGTESTDIR ]] && mkdir -p "$PGTESTDIR"
 export PGTESTDIR
-export KEEP_DATA_DIRS=1
+unset PGTESTROOT
+unset KEEP_DATA_DIRS
 
 # Make
 # Note the justone profile sets this, but we override it here
