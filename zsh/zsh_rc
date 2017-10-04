@@ -52,7 +52,7 @@ if [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
 	# Liquidprompt
 	# Add prefix to set window title
 	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc bundle-liquidprompt" >> ~/.dot_log
-	antigen bundle nojhan/liquidprompt
+	antigen bundle $DOTFILES/externals/liquidprompt --no-local-clone
 
 	# Ruby
 	# antigen bundle ruby
