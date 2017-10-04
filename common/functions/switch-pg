@@ -164,20 +164,11 @@ switch-pg () {
 	# Update test root
 	if [[ ! -z $PGTESTDIR ]]
 	then
-		if [[ $pg_branch == "master" ]]
-		then
-			# If we were on master then simply add new branch as subdir
-			PGTESTDIR=${PGTESTDIR}/$new_pg
-		else
-			# If we were not on master then remove branch
-			PGTESTDIR=${PGTESTDIR%/$pg_branch}
+		# remove the branch
+		PGTESTDIR=${PGTESTDIR%/$pg_branch}
 
-			# If new branch is not master then append it
-			if [[ $new_pg != "master" ]]
-			then
-				PGTESTDIR=${PGTESTDIR}/$new_pg
-			fi
-		fi
+		# add the new one
+		PGTESTDIR=${PGTESTDIR}/$new_pg
 
 		# Create test directory if it doesn't already exist
 		if [[ ! -d $PGTESTDIR ]]
