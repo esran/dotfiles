@@ -1,17 +1,3 @@
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_aliases >> $HOME/.dot_log
-
-# Always use X tunneling for ssh connections
-alias ssh='ssh -X'
-
-# SSH handy stuff
-alias sd='svn diff --diff-cmd ~/bin/diffwrap.sh'
-alias svn_ignore='svn propedit svn:ignore'
-
-# VIM FTW
-alias vi='vim'
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
+# shellcheck shell=bash
+# vim: set ft=sh:
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID bash/bash_aliases" >> "$HOME/.dot_log"

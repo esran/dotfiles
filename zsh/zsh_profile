@@ -1,19 +1,16 @@
 # shellcheck shell=bash
 # vim: set ft=sh:
-echo $HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile >> $HOME/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
+# shellcheck source=/home/sean/.dot
 [[ -f $HOME/.dot ]] && source $HOME/.dot
 
 # Load common profile
+# shellcheck source=/home/sean/.profile
 [[ -f $HOME/.profile ]] && source $HOME/.profile
 
 # Runs first for each shell created in the gnome-session
-
-# LC_COLLATE so that . files get sorted first
-# Actually, don't as this changes sort order in other places too
-# such as out test scripts!
-# export LC_COLLATE="C"
 
 # DEFAULT_USER (for agnoster prompt)
 export DEFAULT_USER=sean
@@ -32,6 +29,3 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
 			;;
 	esac
 fi
-
-# History
-export HISTSIZE=4000 SAVEHIST=10000 HISTFILE=~/.zsh_history

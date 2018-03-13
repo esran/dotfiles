@@ -3,3 +3,10 @@
 # Handle completion for gv as an alias for gvim
 # Copied from /etc/bash_completion
 complete -f -X '*.@(o|so|so.!(conf)|a|rpm|gif|GIF|jp?(e)g|JP?(E)G|mp3|MP3|mp?(e)g|MPG|avi|AVI|asf|ASF|ogg|OGG|class|CLASS)' gv
+
+DOTFILES=${DOTFILES:-$HOME/.dotfiles}
+for bcfile in $DOTFILES/bash/completion/*.bash
+do
+	# shellcheck disable=SC1090
+	. "$bcfile"
+done

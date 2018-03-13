@@ -1,4 +1,4 @@
-# shellcheck shell=bash
+#!/usr/bin/env zsh
 # shellcheck disable=1090
 # vim: set ft=zsh:
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
@@ -8,8 +8,35 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 
 # Runs second (after .zprofile) for each shell created in the gnome-session
 
+if true && [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
+then
+	### Added by Zplugin's installer
+	source "$HOME/.zplugin/bin/zplugin.zsh"
+	autoload -Uz _zplugin
+	(( ${+_comps} )) && _comps[zplugin]=_zplugin
+	### End of Zplugin's installer chunk
+
+	# Oh my zsh
+	zplugin snippet OMZ::lib/key-bindings.zsh
+	zplugin snippet OMZ::lib/git.zsh
+	zplugin snippet OMZ::plugins/git/git.plugin.zsh
+
+	# Load plugins
+	zplugin light zsh-users/zsh-syntax-highlighting
+	zplugin light zsh-users/zsh-history-substring-search
+	zplugin light zsh-users/zsh-completions
+	zplugin light Tarrasch/zsh-autoenv
+
+	# Optional plugins
+	if [[ -d $DOTFILES/externals/liquidprompt ]]
+	then
+		zplugin light $DOTFILES/externals/liquidprompt
+		prompt_tag
+	fi
+fi
+
 # Antigen
-if [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
+if false && [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
 	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc load-antigen" >> ~/.dot_log
 	source "$DOTFILES/externals/antigen/antigen.zsh"
 
@@ -63,7 +90,7 @@ if [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
 	antigen bundle psprint/zsh-cmd-architect
 
 	# Autoenv - per directory rc
-	antigen bundle horosgrisa/autoenv
+	antigen bundle Tarrasch/zsh-autoenv
 
 	# APPLY ANTIGEN CHANGES
 	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc antigen-apply" >> ~/.dot_log
@@ -73,13 +100,13 @@ if [[ -f "$DOTFILES/externals/antigen/antigen.zsh" ]]; then
 	prompt_tag
 fi
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-antigen" >> ~/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-plugins" >> ~/.dot_log
 
 # oh-my-zsh clobbers LESS :(
 export LESS="-F -X -R"
 
 # History substring search
-zmodload zsh/terminfo
+# zmodload zsh/terminfo
 # shellcheck disable=2154
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
@@ -129,12 +156,23 @@ then
 fi
 
 # History
-# Append, but don't update in real time, only on exit.
-# This overrides the oh-my-zsh default which results in live sharing of
-# history across shells. Nasty.
-unsetopt share_history
-unsetopt inc_append_history
-setopt   append_history
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000000
+SAVEHIST=10000000
+
+setopt BANG_HIST                 # Treat the '!' character specially during expansion.
+setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
+setopt HIST_IGNORE_DUPS          # Dont record an entry that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
+setopt HIST_IGNORE_SPACE         # Dont record an entry starting with a space.
+setopt HIST_SAVE_NO_DUPS         # Dont write duplicate entries in the history file.
+setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
+setopt HIST_VERIFY               # Dont execute immediately upon history expansion.
+setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 
 # FZF
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
@@ -170,3 +208,17 @@ then
 	fi
 	unset branch
 fi
+
+# Pick up completion functions
+if [[ -d $DOTFILES/zsh/completion ]]
+then
+	fpath+=($DOTFILES/zsh/completion)
+fi
+
+# Git hub completions
+if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
+	fpath+=(~/Stuff/git-hub/share/zsh-completion)
+fi
+
+source ~/.zsh_completion
+zplugin cdreplay -q # -q is for quiet

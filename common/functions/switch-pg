@@ -43,6 +43,17 @@ switch-pg () {
 	if [[ -z $new_jo ]]
 	then
 		new_jo=$new_pg
+
+		# find a match from the new VERSION file
+		if [[ -f ~/work/PostgreSQL/$new_pg/JustOne/VERSION ]]
+		then
+			VER=$(awk -F. '{ printf("V%d-%d", $1, $2); }' ~/work/PostgreSQL/$new_pg/JustOne/VERSION)
+			if [[ -d ~/work/JustOne/$VER ]]
+			then
+				new_jo=$VER
+			fi
+		fi
+
 	elif [[ "$new_jo" == "-" ]]
 	then
 		new_jo=$jo_branch
@@ -178,15 +189,7 @@ switch-pg () {
 	fi
 
 	# Update prompt
-	if [[ "$new_jo" != "master" ]]
-	then
-		prompt_tag "[$new_pg/$new_jo]"
-	elif [[ "$new_pg" != "master" ]]
-	then
-		prompt_tag "[$new_pg]"
-	else
-		prompt_tag
-	fi
+	prompt_tag "[$new_pg/$new_jo]"
 
 	PG_BRANCH="$new_pg"
 	JO_BRANCH="$new_jo"
@@ -197,7 +200,8 @@ switch-pg () {
 	# postgres then cd there
 	if [[ ! $PWD/ =~ ~/work/PostgreSQL/$PG_BRANCH/.* ]]
 	then
-		pgcd
+		# shellcheck disable=SC2164
+		cd ~/work/PostgreSQL/$PG_BRANCH
 	fi
 }
 

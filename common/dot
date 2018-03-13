@@ -10,17 +10,23 @@ if [[ -z $_DOT ]]
 then
 	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot" >> "$HOME/.dot_log"
 	_DOT=1
+
+	# Add home bin to path. Useful for ssh
+	PATH=$PATH:$HOME/bin
+
+	# Ensure useful umask
+	umask 022
 fi
 
 # Tweak $HOME to pick up locally mounted rather than NFS mounted
 # if possible.
-if [[ -z $ORIG_HOME ]]
+if [[ -z $_ORIG_HOME ]]
 then
 	if [[ -d /home/local/$LOGNAME ]]
 	then
 		if [[ -e /home/local/$LOGNAME/.dot ]]
 		then
-			export ORIG_HOME=$HOME
+			export _ORIG_HOME=$HOME
 			export HOME=/home/local/$LOGNAME
 		fi
 	fi

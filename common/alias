@@ -20,9 +20,6 @@ else
 	unalias vi
 fi
 
-# Meld, make sure we're using system python, not our neovim virtualenv one
-# alias meld='PATH=/usr/bin:$PATH command meld'
-
 # branch/worktree handling
 PG_BRANCH=${PG_BRANCH:-master}
 JO_BRANCH=${JO_BRANCH:-master}
@@ -34,3 +31,24 @@ if [[ ! -z $MAX_JOBS && ! -z $MAX_LOAD ]]
 then
 	alias ninja='ninja -j$MAX_JOBS -l$MAX_LOAD'
 fi
+
+# various ls aliases
+alias lsf='ls *(.)'
+alias lsd='ls -d *(/)'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Always use X tunneling for ssh connections
+alias ssh='ssh -X'
+
+# SSH handy stuff
+alias sd='svn diff --diff-cmd ~/bin/diffwrap.sh'
+alias svn_ignore='svn propedit svn:ignore'
+
+# MADlib build aliases
+alias me='grep ^ERROR Testing/Temporary/LastTest.log'
+alias mecp='grep ^ERROR Testing/Temporary/LastTest.log | python ~/madlib-test-stdout-update.py'
+
+# Perl module version check
+alias modver="perl -e\"eval qq{use \\\$ARGV[0];\\\\\\\$v=\\\\\\\$\\\${ARGV[0]}::VERSION;};\ print\\\$@?qq{No module found\\n}:\\\$v?qq{Version \\\$v\\n}:qq{Found.\\n};\"\$1"

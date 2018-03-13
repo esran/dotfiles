@@ -154,3 +154,6 @@ if [[ ! -f $HOSTFILE ]]
 then
 	get_host_file
 fi
+
+# direnv
+eval "$(direnv hook bash)"

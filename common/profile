@@ -101,16 +101,22 @@ pathadd ~/.local/bin pre
 ldpathadd ~/.local/lib pre
 manpathadd ~/.local/man pre
 
+# GO
+pathadd ~/stuff/go-git/bin
+
 # Setting MANPATH at all means default man path isn't checked :(
 manpathadd /usr/share/man
 
 # Perlbrew
 pathadd ~/perl5/perlbrew/bin pre
 
+# Cargo (rust)
+pathadd ~/.cargo/bin
+
 # Always stick my bin on the front of the path
-pathadd "$ORIG_HOME/bin" pre
+[[ -n $_ORIG_HOME ]] && pathadd "$_ORIG_HOME/bin" pre
 pathadd ~/bin pre
-pathadd "$HOME/$HOSTNAME/bin" pre
+# pathadd "$HOME/$HOSTNAME/bin" pre
 
 # git hub plugin
 if [[ -d ~/stuff/git-hub ]]; then
@@ -125,7 +131,7 @@ export PATH LD_LIBRARY_PATH MANPATH
 # Setup test directory for PostgreSQL JustOne tests
 # This needs to be a normalised path
 PGTESTROOT=$HOME
-[[ -d /run/shm ]] && PGTESTROOT=/run/shm/sean
+# [[ -d /run/shm ]] && PGTESTROOT=/run/shm/sean
 [[ ! -d $PGTESTROOT ]] && mkdir "$PGTESTROOT"
 [[ -d $PGTESTROOT/test ]] && PGTESTDIR=$PGTESTROOT/test/master
 [[ -d $PGTESTROOT/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$PGTESTROOT/$HOSTNAME/test/master")
@@ -169,7 +175,7 @@ then
 	esac
 fi
 
-# Perlbrew
+# # Perlbrew
 if [[ -d ~/perl5/perlbrew ]]
 then
 	export PERLBREW_ROOT=~/perl5/perlbrew
@@ -179,13 +185,14 @@ then
 	then
 		source "$PERLBREW_ROOT/etc/bashrc"
 	fi
-fi
 
-# Perl local::lib
-# if [[ -d $PERLBREW ]]
-# then
-# 	eval "$(perl -I ~/ "~/perl5/lib/perl5" -Mlocal::lib="~/perl5")"
-# fi
+	# local::lib
+	if [[ -d ~/perl5/lib/perl5 ]]
+	then
+		# shellcheck disable=SC2046
+		eval $(perl -I~/perl5/lib/perl5 -Mlocal::lib)
+	fi
+fi
 
 # STOW
 export STOW_DIR=~/install/stow
@@ -204,7 +211,7 @@ export CCACHE_NOHASHDIR=1
 # CDPATH
 # We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
 cdpathadd . pre
-cdpathadd "$HOME/$HOSTNAME"
+# cdpathadd "$HOME/$HOSTNAME"
 
 # LESS
 export LESS="-F -X -R"
@@ -216,7 +223,7 @@ umask 022
 ulimit -c unlimited
 
 # neovim
-export NVIM_TUI_ENABLE_CURSOR_SHAPE=0
+# export NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 if which -a nvim > /dev/null 2>&1
 then
 	export EDITOR=nvim

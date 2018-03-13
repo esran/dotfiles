@@ -1,22 +1,14 @@
-# vim: set ft=zsh:
-echo ${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env >> $HOME/.dot_log
+#!/usr/bin/env bash
+# vim: set ft=sh:
+
+echo "${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
-[ -f $HOME/.dot ] && . $HOME/.dot
-
-# Pick up completion functions
-if [[ -d $DOTFILES/zsh/completion ]]
-then
-	fpath=($fpath $DOTFILES/zsh/completion)
-fi
+# shellcheck source=/home/sean/.dot
+[ -f "$HOME/.dot" ] && . "$HOME/.dot"
 
 # Pick up common functions
 if [[ -d $DOTFILES/common/functions ]]
 then
 	fpath+=($DOTFILES/common/functions)
-fi
-
-# Git hub completions
-if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
-	fpath=($fpath ~/Stuff/git-hub/share/zsh-completion)
 fi
