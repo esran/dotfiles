@@ -12,6 +12,13 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 # get this in early before we load the plugin
 [[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
 
+# Install zplugin if not already installed
+if [[ ! -f $HOME/.zplugin/bin/zplugin.zsh ]]
+then
+	echo "NOTICE: installing zplugin"
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+fi
+
 if [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
 then
 	### Added by Zplugin's installer
@@ -34,6 +41,8 @@ then
 	# Prompt
 	zplugin light esran/liquidprompt
 	prompt_tag
+else
+	echo "WARNING: zplugin not found!"
 fi
 
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-plugins" >> ~/.dot_log
