@@ -8,9 +8,13 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 
 # Runs second (after .zprofile) for each shell created in the gnome-session
 
+# word style (primarily for ^w deletion of path segments)
+autoload -U select-word-style
+select-word-style bash
+
 # Liquidprompt configuration
 # get this in early before we load the plugin
-[[ -f ~/.liquitpromptrc ]] && . ~/.liquitpromptrc
+[[ -f ~/.liquidpromptrc ]] && . ~/.liquidpromptrc
 
 # Install zplugin if not already installed
 if [[ ! -f $HOME/.zplugin/bin/zplugin.zsh ]]
@@ -37,9 +41,10 @@ then
 	zplugin light zsh-users/zsh-history-substring-search
 	zplugin light zsh-users/zsh-completions
 	zplugin light Tarrasch/zsh-autoenv
+	zplugin light psprint/zsh-editing-workbench
 
 	# Prompt
-	zplugin light esran/liquidprompt
+	zplugin load esran/liquidprompt
 	prompt_tag
 else
 	echo "WARNING: zplugin not found!"
@@ -105,10 +110,12 @@ HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000000
 SAVEHIST=10000000
 
+unsetopt INC_APPEND_HISTORY   	 # Don't write history on command start
+unsetopt SHARE_HISTORY           # Don't share between sessions
+
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
 setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
+setopt INC_APPEND_HISTORY_TIME   # Write to the history file immediately after command
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 setopt HIST_IGNORE_DUPS          # Dont record an entry that was just recorded again.
 setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
@@ -166,7 +173,7 @@ fi
 source ~/.zsh_completion
 
 # zplugin completion replay?
-if [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
-then
-	zplugin cdreplay -q # -q is for quiet
-fi
+# if [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
+# then
+# 	zplugin cdreplay -q # -q is for quiet
+# fi

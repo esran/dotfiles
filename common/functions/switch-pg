@@ -188,13 +188,21 @@ switch-pg () {
 		fi
 	fi
 
-	# Update prompt
-	prompt_tag "[$new_pg/$new_jo]"
-
 	PG_BRANCH="$new_pg"
 	JO_BRANCH="$new_jo"
 
 	export PG_BRANCH JO_BRANCH
+
+	# Set JOPORT
+	if [[ -f ~/work/PostgreSQL/$PG_BRANCH/.joport ]]
+	then
+		JOPORT=$(< ~/work/PostgreSQL/$PG_BRANCH/.joport)
+	else
+		JOPORT=$(get-port-number.pl --username "$USER" --product justonedb)
+	fi
+
+	# Update prompt
+	prompt_tag "[$new_pg/$new_jo:$JOPORT]"
 
 	# If we're not in a sub directory of the new
 	# postgres then cd there

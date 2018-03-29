@@ -223,7 +223,6 @@ umask 022
 ulimit -c unlimited
 
 # neovim
-# export NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 if which -a nvim > /dev/null 2>&1
 then
 	export EDITOR=nvim

@@ -9,15 +9,20 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias" >> "$HOME/.
 # Default to color for ls
 alias ls='ls --color=tty'
 
-# Default to nvim for vi
-if which -a nvim > /dev/null 2>&1
+# vim defaults
+# add alias for nvim-qt as nv
+if which -a nvim-qt > /dev/null 2>&1
 then	
+	alias nv=nvim-qt
+fi
+
+# add alias to vim explicitly for vi
+if which -a nvim > /dev/null 2>&1
+then
 	alias vi=nvim
 elif which -a vim > /dev/null 2>&1
 then
 	alias vi=vim
-else
-	unalias vi
 fi
 
 # branch/worktree handling
