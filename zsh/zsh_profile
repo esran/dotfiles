@@ -16,7 +16,7 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile" >> "$HOME
 export DEFAULT_USER=sean
 
 # Color TERM
-if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" ]]; then
+if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" || "$COLORTERM" = "truecolor" ]]; then
 	case $TERM in
 		xterm*)
 			TERM=xterm-256color

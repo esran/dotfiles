@@ -92,6 +92,10 @@ manpathadd "$ORIG_HOME/$HOSTNAME/install/share/man" pre
 manpathadd ~/install/man pre
 manpathadd "$HOME/$HOSTNAME/install/man" pre
 
+# sbin
+pathadd /usr/sbin
+pathadd /sbin
+
 # Qt 5
 pathadd ~/stuff/qt-5.8.0/5.8/gcc_64/bin
 ldpathadd ~/stuff/qt-5.8.0/5.8/gcc_64/lib
@@ -100,6 +104,9 @@ ldpathadd ~/stuff/qt-5.8.0/5.8/gcc_64/lib
 pathadd ~/.local/bin pre
 ldpathadd ~/.local/lib pre
 manpathadd ~/.local/man pre
+
+# Snap
+pathadd /snap/bin
 
 # GO
 pathadd ~/stuff/go-git/bin
@@ -171,6 +178,7 @@ then
 			export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
 			;;
 		*)
+			export JAVA_HOME=/usr/lib/jvm/default-java
 			;;
 	esac
 fi
