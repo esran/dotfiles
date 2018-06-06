@@ -96,6 +96,9 @@ manpathadd "$HOME/$HOSTNAME/install/man" pre
 pathadd /usr/sbin
 pathadd /sbin
 
+# go
+pathadd ~/go/bin
+
 # Qt 5
 pathadd ~/stuff/qt-5.8.0/5.8/gcc_64/bin
 ldpathadd ~/stuff/qt-5.8.0/5.8/gcc_64/lib
@@ -141,9 +144,10 @@ PGTESTROOT=$HOME
 # [[ -d /run/shm ]] && PGTESTROOT=/run/shm/sean
 [[ ! -d $PGTESTROOT ]] && mkdir "$PGTESTROOT"
 [[ -d $PGTESTROOT/test ]] && PGTESTDIR=$PGTESTROOT/test/master
-[[ -d $PGTESTROOT/$HOSTNAME/test ]] && PGTESTDIR=$(readlink -f "$PGTESTROOT/$HOSTNAME/test/master")
+[[ -d $PGTESTROOT/$HOSTNAME/test ]] && PGTESTDIR=$PGTESTROOT/$HOSTNAME/test/master
 [[ -z $PGTESTDIR ]] && PGTESTDIR=$PGTESTROOT/test/master
 [[ ! -d $PGTESTDIR ]] && mkdir -p "$PGTESTDIR"
+PGTESTDIR=$(readlink -f "$PGTESTDIR")
 export PGTESTDIR
 unset PGTESTROOT
 unset KEEP_DATA_DIRS

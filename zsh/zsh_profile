@@ -2,6 +2,13 @@
 # vim: set ft=sh:
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile" >> "$HOME/.dot_log"
 
+# Source the /etc/profile if present. This will ensure
+# we pick up stuff like snap
+if [[ -f /etc/profile ]]
+then
+	emulate sh -c 'source /etc/profile'
+fi
+
 # Initialise DOTFILES
 # shellcheck source=/home/sean/.dot
 [[ -f $HOME/.dot ]] && source $HOME/.dot
