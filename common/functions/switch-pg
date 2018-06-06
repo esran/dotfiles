@@ -200,6 +200,9 @@ switch-pg () {
 	else
 		JOPORT=$(get-port-number.pl --username "$USER" --product justonedb)
 	fi
+	(( JOLICENSEPORT = JOPORT + 1 ))
+
+	export JOPORT JOLICENSEPORT
 
 	# Update prompt
 	prompt_tag "[$new_pg/$new_jo:$JOPORT]"
