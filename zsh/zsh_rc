@@ -8,47 +8,29 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 
 # Runs second (after .zprofile) for each shell created in the gnome-session
 
-# word style (primarily for ^w deletion of path segments)
-autoload -U select-word-style
-select-word-style bash
-
 # Liquidprompt configuration
 # get this in early before we load the plugin
 [[ -f ~/.liquidpromptrc ]] && . ~/.liquidpromptrc
 
-# Install zplugin if not already installed
-if [[ ! -f $HOME/.zplugin/bin/zplugin.zsh ]]
+# Antigen Install
+if [[ ! -d $HOME/.antigen ]]
 then
-	echo "NOTICE: installing zplugin"
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+	echo "NOTICE: cloning antigen"
+	git clone https://github.com/zsh-users/antigen.git $HOME/.antigen
 fi
+source $HOME/.antigen/antigen.zsh
 
-if [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
-then
-	### Added by Zplugin's installer
-	source "$HOME/.zplugin/bin/zplugin.zsh"
-	autoload -Uz _zplugin
-	(( ${+_comps} )) && _comps[zplugin]=_zplugin
-	### End of Zplugin's installer chunk
+# Antigen Bundles
+antigen use oh-my-zsh
+antigen bundle git
+antigen bundle command-not-found
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-history-substring-search
+antigen bundle zsh-users/zsh-completions
+antigen bundle esran/liquidprompt
 
-	# Oh my zsh
-	zplugin snippet OMZ::lib/key-bindings.zsh
-	zplugin snippet OMZ::lib/git.zsh
-	zplugin snippet OMZ::plugins/git/git.plugin.zsh
-
-	# Load plugins
-	zplugin light zsh-users/zsh-syntax-highlighting
-	zplugin light zsh-users/zsh-history-substring-search
-	zplugin light zsh-users/zsh-completions
-	zplugin light Tarrasch/zsh-autoenv
-	zplugin light psprint/zsh-editing-workbench
-
-	# Prompt
-	zplugin load esran/liquidprompt
-	prompt_tag
-else
-	echo "WARNING: zplugin not found!"
-fi
+# Antigen Done
+antigen apply
 
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-plugins" >> ~/.dot_log
 
@@ -168,12 +150,3 @@ fi
 if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
 	fpath+=(~/Stuff/git-hub/share/zsh-completion)
 fi
-
-# General completion control
-source ~/.zsh_completion
-
-# zplugin completion replay?
-# if [[ -f $HOME/.zplugin/bin/zplugin.zsh ]]
-# then
-# 	zplugin cdreplay -q # -q is for quiet
-# fi
