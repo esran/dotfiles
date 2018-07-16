@@ -198,12 +198,13 @@ then
 		source "$PERLBREW_ROOT/etc/bashrc"
 	fi
 
-	# local::lib
-	if [[ -d ~/perl5/lib/perl5 ]]
-	then
-		# shellcheck disable=SC2046
-		eval $(perl -I~/perl5/lib/perl5 -Mlocal::lib)
-	fi
+fi
+
+# local::lib
+if [[ -d ~/perl5/lib/perl5 ]]
+then
+	# shellcheck disable=SC2046
+	eval $(perl -I~/perl5/lib/perl5 -Mlocal::lib)
 fi
 
 # STOW
