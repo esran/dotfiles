@@ -247,9 +247,11 @@ else
 fi
 
 # Python (pyenv)
-pathadd ~/.pyenv/bin pre
+PYENV_ROOT="$HOME/.pyenv"
+pathadd "$PYENV_ROOT/bin" pre
 if hash pyenv >& /dev/null
 then
+	export PYENV_ROOT
 	eval "$(pyenv init -)"
 	eval "$(pyenv virtualenv-init -)"
 fi
