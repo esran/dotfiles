@@ -1,12 +1,3 @@
 [submodule "externals/dircolors-solarized"]
 	path = externals/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
-[submodule "externals/antigen"]
-	path = externals/antigen
-	url = git://github.com/zsh-users/antigen.git
-[submodule "externals/git-prompt"]
-	path = externals/git-prompt
-	url = git://github.com/lvv/git-prompt.git
-[submodule "externals/liquidprompt"]
-	path = externals/liquidprompt
-	url = git://github.com/nojhan/liquidprompt.git
