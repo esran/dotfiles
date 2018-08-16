@@ -1,3 +1,6 @@
 [submodule "externals/dircolors-solarized"]
 	path = externals/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
+[submodule "externals/liquidprompt"]
+	path = externals/liquidprompt
+	url = https://github.com/esran/liquidprompt.git
