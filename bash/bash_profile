@@ -19,5 +19,7 @@ umask 022
 
 # Source the bashrc if required
 ENV=~/.bashrc
-tty -s
-(( $? == 0 )) && source $ENV
+if ! tty -s 
+then
+	source $ENV
+fi

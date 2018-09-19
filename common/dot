@@ -1,12 +1,17 @@
-# shellcheck shell=bash
+# shellcheck shell=sh
 # vim: set ft=sh:
 # NOTE: This gets sourced for both BASH and ZSH so be careful
+# NOTE: This gets sourced by xsession as sh so needs to work with that!
 
 # Make sure HOSTNAME is set
-[[ ! -z $HOSTNAME ]] || HOSTNAME=$(hostname -s)
+if [ "$HOSTNAME" = "" ]
+then
+	HOSTNAME=$(hostname -s)
+fi
 export HOSTNAME
 
-if [[ -z $_DOT ]]
+# _DOT controls whether we've run this already or not
+if [ "$_DOT" = "" ]
 then
 	echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/dot" >> "$HOME/.dot_log"
 	_DOT=1
@@ -20,11 +25,11 @@ fi
 
 # Tweak $HOME to pick up locally mounted rather than NFS mounted
 # if possible.
-if [[ -z $_ORIG_HOME ]]
+if [ "$_ORIG_HOME" = "" ] || [ "$_ORIG_HOME"  = "$HOME" ]
 then
-	if [[ -d /home/local/$LOGNAME ]]
+	if test -d "/home/local/$LOGNAME"
 	then
-		if [[ -e /home/local/$LOGNAME/.dot ]]
+		if test -e "/home/local/$LOGNAME/.dot"
 		then
 			export _ORIG_HOME=$HOME
 			export HOME=/home/local/$LOGNAME
@@ -34,15 +39,14 @@ fi
 
 # Find out true location. Note that this assumes we have actually
 # been installed as ~/.profile!
-if [[ -z $DOTFILES ]]
+if [ "$DOTFILES" = "" ]
 then
-	DOTFILES=$(readlink ~/.dot)
-	if [[ $? -eq 0 ]]
+	if ! DOTFILES=$(readlink ~/.dot)
 	then
 		DOTFILES=$(dirname "$DOTFILES")
 		DOTFILES=${DOTFILES%/common}
 		# Check for a relative path which won't start with a slash
-		if [[ -n ${DOTFILES##/*} ]]
+		if [ "${DOTFILES##/*}" != "" ]
 		then
 			DOTFILES=~/$DOTFILES
 		fi
