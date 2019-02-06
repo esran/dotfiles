@@ -3,12 +3,12 @@
 # vim: se syn=sh:
 # NOTE: needs to run as sh (from xsession)
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/profile" >> "$HOME/.dot_log"
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  common/profile" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
 if test -f "$HOME/.dot"
 then
-	. "$HOME/.dot"
+	source "$HOME/.dot"
 fi
 
 # This gets loaded as the only startup file prior to the gnome-session
@@ -23,245 +23,16 @@ if ! which env-check > /dev/null 2>&1
 then
 	if test -f /etc/justone_profile
 	then
-		. /etc/justone_profile
+		echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID source /etc/justone_profile $SHELL" >> ~/.dot_log
+        case $SHELL in
+            *zsh)
+                emulate sh -c 'source /etc/justone_profile'
+                ;;
+            *)
+		        source /etc/justone_profile
+                ;;
+        esac
 	fi
 fi
 
-#################
-# Path functions.
-#################
-
-# Path add function
-# If there is a second parameter then prepend instead of append
-pathadd() {
-	# if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-	if test -d "$1" && ! echo "$PATH" | /bin/grep -Eq "(^|:)$1($|:)" ; then
-		if [ -z "$2" ]; then
-			PATH="${PATH:+"$PATH:"}$1"
-		else
-			PATH="$1${PATH:+":$PATH"}"
-		fi
-	fi
-}
-
-# LD_LIBRARY_PATH
-# If there is a second parameter then prepend instead of append
-ldpathadd() {
-	# if [ -d "$1" ] && [[ ":$LD_LIBRARY_PATH:" != *":$1:"* ]]; then
-	if test -d "$1" && ! echo "$LD_LIBRARY_PATH" | /bin/grep -Eq "(^|:)$1($|:)" ; then
-		if [ -z "$2" ]; then
-			LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+"$LD_LIBRARY_PATH:"}$1"
-		else
-			LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH:+":$LD_LIBRARY_PATH"}"
-		fi
-	fi
-}
-
-# MANPATH
-# If there is a second parameter then prepend instead of append
-manpathadd() {
-	# if [ -d "$1" ] && [[ ":$MANPATH:" != *":$1:"* ]]; then
-	if test -d "$1" && ! echo "$MANPATH" | /bin/grep -Eq "(^|:)$1($|:)" ; then
-		if [ -z "$2" ]; then
-			MANPATH="${MANPATH:+"$MANPATH:"}$1"
-		else
-			MANPATH="$1${MANPATH:+":$MANPATH"}"
-		fi
-	fi
-}
-
-# Path add function
-# If there is a second parameter then prepend instead of append
-cdpathadd() {
-	# if [ -d "$1" ] && [[ ":$CDPATH:" != *":$1:"* ]]; then
-	if test -d "$1" && ! echo "$MANPATH" | /bin/grep -Eq "(^|:)$1($|:)" ; then
-		if [ -z "$2" ]; then
-			CDPATH="${CDPATH:+"$CDPATH:"}$1"
-		else
-			CDPATH="$1${CDPATH:+":$CDPATH"}"
-		fi
-	fi
-}
-
-# Library path
-ldpathadd /usr/local/lib
-
-# Locally installed stuff. Each of these will be placed on the path before the
-# previous elements
-for _dir in "$_ORIG_HOME" "$_ORIG_HOME/install" ~ ~/install "$HOME/$HOSTNAME/install" ~/.local
-do
-	if test -d "$_dir"
-	then
-		pathadd "$_dir/bin" pre
-		ldpathadd "$_dir/lib/x86_64-linux-gnu" pre
-		ldpathadd "$_dir/lib" pre
-		manpathadd "$_dir/share/man" pre
-		manpathadd "$_dir/man" pre
-	fi
-done
-
-# sbin
-pathadd /usr/sbin
-pathadd /sbin
-
-# go
-pathadd ~/go/bin
-
-# Qt 5
-pathadd ~/stuff/qt-5.8.0/5.8/gcc_64/bin
-ldpathadd ~/stuff/qt-5.8.0/5.8/gcc_64/lib
-
-# Snap
-pathadd /snap/bin
-
-# GO
-pathadd ~/stuff/go-git/bin
-
-# Setting MANPATH at all means default man path isn't checked :(
-manpathadd /usr/share/man
-
-# Perlbrew
-pathadd ~/perl5/perlbrew/bin pre
-
-# Cargo (rust)
-pathadd ~/.cargo/bin
-
-# git hub plugin
-if test -d ~/stuff/git-hub
-then
-	pathadd ~/stuff/git-hub/lib
-	manpathadd ~/stuff/git-hub/man
-	export GIT_HUB_ROOT=$HOME/stuff/git-hub
-fi
-
-# Ensure PATH and MANPATH are exported
-export PATH LD_LIBRARY_PATH MANPATH
-
-# Setup test directory for PostgreSQL JustOne tests
-# This needs to be a normalised path
-PGTESTROOT=$HOME
-# test -d /run/shm && PGTESTROOT=/run/shm/sean
-test ! -d "$PGTESTROOT" && mkdir "$PGTESTROOT"
-test -d "$PGTESTROOT/test" && PGTESTDIR=$PGTESTROOT/test/master
-test -d "$PGTESTROOT/$HOSTNAME/test" && PGTESTDIR=$PGTESTROOT/$HOSTNAME/test/master
-test -z "$PGTESTDIR" && PGTESTDIR=$PGTESTROOT/test/master
-test ! -d "$PGTESTDIR" && mkdir -p "$PGTESTDIR"
-PGTESTDIR=$(readlink -f "$PGTESTDIR")
-export PGTESTDIR
-unset PGTESTROOT
-unset KEEP_DATA_DIRS
-
-# Make
-# Note the justone profile sets this, but we override it here
-MAX_JOBS=$(( $(grep -c processor /proc/cpuinfo) * 3 / 4 ))
-MAX_LOAD=$(( MAX_JOBS ))
-MAKEFLAGS="-j$MAX_JOBS -l$MAX_LOAD V=0 --no-print-directory"
-export MAKEFLAGS
-
-# Ninja
-export NINJA_STATUS="[%f/%t] [%r/%o/%p] "
-export NINJAFLAGS="-j$MAX_JOBS -l$MAX_LOAD"
-
-# Temp folder
-export TMPDIR=/tmp/${USER:-$LOGNAME}
-test ! -d "$TMPDIR" && mkdir "$TMPDIR"
-
-# Setup solarized dircolors
-if test -d "$DOTFILES/externals/dircolors-solarized"
-then
-	if test -f "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light"
-	then
-		eval "$(dircolors "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light")"
-	fi
-fi
-
-# Java home
-if [ "$JAVA_HOME" = "" ]
-then
-	case $(hostname) in
-		iowa)
-			export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
-			;;
-		*)
-			export JAVA_HOME=/usr/lib/jvm/default-java
-			;;
-	esac
-fi
-
-# # Perlbrew
-if test -d ~/perl5/perlbrew
-then
-	export PERLBREW_ROOT=~/perl5/perlbrew
-	export PERLBREW_HOME=~/.perlbrew
-
-	if test -f $PERLBREW_ROOT/etc/bashrc
-	then
-		. "$PERLBREW_ROOT/etc/bashrc"
-	fi
-
-fi
-
-# local::lib
-if test -d ~/perl5/lib/perl5
-then
-	# shellcheck disable=SC2046
-	eval $(perl -I~/perl5/lib/perl5 -Mlocal::lib)
-fi
-
-# STOW
-if test -d ~/install/stow
-then
-	export STOW_DIR=~/install/stow
-elif test -d ~/stow
-then
-	export STOW_DIR=~/stow
-fi
-
-# RVM
-if ! which rvm > /dev/null 2>&1
-then
-	test -f "$HOME/.rvm/scripts/rvm" && . "$HOME/.rvm/scripts/rvm"
-fi
-
-# CCACHE
-test -d ~/ccache && export CCACHE_DIR=~/ccache
-test -d "$HOME/$HOSTNAME/ccache" && export CCACHE_DIR=~/$HOSTNAME/ccache
-export CCACHE_NOHASHDIR=1
-
-# CDPATH
-# We need to add . as /bin/sh will ONLY consider CDPATH if it is set!
-cdpathadd . pre
-# cdpathadd "$HOME/$HOSTNAME"
-
-# LESS
-export LESS="-F -X -R"
-
-# Sensible file permissions by default
-umask 022
-
-# allow core files
-ulimit -c unlimited
-
-# neovim
-if which -a nvim > /dev/null 2>&1
-then
-	export EDITOR=nvim
-elif which -a vim > /dev/null 2>&1
-then
-	export EDITOR=vim
-else
-	export EDITOR=vi
-fi
-
-# Python (pyenv)
-PYENV_ROOT="$HOME/.pyenv"
-pathadd "$PYENV_ROOT/bin" pre
-if hash pyenv > /dev/null 2>&1
-then
-	export PYENV_ROOT
-	eval "$(pyenv init -)"
-	eval "$(pyenv virtualenv-init -)"
-fi
-
-# Cargo (rust)
-pathadd "$HOME/.cargo/bin"
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT common/profile" >> "$HOME/.dot_log"

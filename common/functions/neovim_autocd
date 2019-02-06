@@ -3,5 +3,5 @@
 
 # Link neovim terminal to shell's directory
 neovim_autocd() {
-    [[ $NVIM_LISTEN_ADDRESS ]] && neovim-autocd.py 2> /dev/null
+    [[ ! -z $NVIM_LISTEN_ADDRESS ]] && neovim-autocd.py 2> /dev/null
 }

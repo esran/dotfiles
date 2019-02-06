@@ -1,13 +1,6 @@
 # shellcheck shell=bash
 # vim: set ft=sh:
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_profile" >> "$HOME/.dot_log"
-
-# Source the /etc/profile if present. This will ensure
-# we pick up stuff like snap
-if [[ -f /etc/profile ]]
-then
-	emulate sh -c 'source /etc/profile'
-fi
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  zsh/zsh_profile" >> "$HOME/.dot_log"
 
 # Initialise DOTFILES
 # shellcheck source=/home/sean/.dot
@@ -36,3 +29,5 @@ if [[ -z $COLORTERM || "$COLORTERM" = "gnome-terminal" || "$COLORTERM" = "trueco
 			;;
 	esac
 fi
+
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT zsh/zsh_profile" >> "$HOME/.dot_log"

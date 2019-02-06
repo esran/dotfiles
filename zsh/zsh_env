@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
 # vim: set ft=sh:
 
-echo "${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env" >> "$HOME/.dot_log"
+# Make sure HOSTNAME is set
+if [ "$HOSTNAME" = "" ]
+then
+	HOSTNAME=$(hostname -s)
+fi
+export HOSTNAME
+
+echo "${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  zsh/zsh_env" >> "$HOME/.dot_log"
+
+# Source the /etc/profile if present. This will ensure
+# we pick up stuff like snap
+if [[ -f /etc/profile && -z $_ETC_PROFILE ]]
+then
+	emulate sh -c 'source /etc/profile'
+    _ETC_PROFILE=1
+fi
 
 # Initialise DOTFILES
 # shellcheck source=/home/sean/.dot
@@ -10,5 +25,7 @@ echo "${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_env" >>
 # Pick up common functions
 if [[ -d $DOTFILES/common/functions ]]
 then
-	fpath+=($DOTFILES/common/functions)
+	fpath+=("$DOTFILES/common/functions")
 fi
+
+echo "${HOSTNAME:-<unset>} $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT zsh/zsh_env" >> "$HOME/.dot_log"

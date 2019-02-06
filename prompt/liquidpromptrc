@@ -5,7 +5,7 @@
 # Initialise DOTFILES
 [[ -f $HOME/.dot ]] && source "$HOME/.dot"
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID prompt/liquidpromptrc" >> "$HOME/.dot_log"
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  prompt/liquidpromptrc" >> "$HOME/.dot_log"
 
 
 ####################################
@@ -161,7 +161,12 @@ LP_TIME_ANALOG=0
 # recommended value is 0
 # See LP_TITLE_OPEN and LP_TITLE_CLOSE to change escape characters to adapt this
 # feature to your specific terminal.
-LP_ENABLE_TITLE=1
+if [[ $TERM =~ eterm ]]
+then
+    LP_ENABLE_TITLE=0
+else
+    LP_ENABLE_TITLE=1
+fi
 
 # Enable Title for screen and byobu
 LP_ENABLE_SCREEN_TITLE=1
@@ -179,3 +184,4 @@ LP_MARK_PREFIX=""
 # Disable SVN as it is too slow
 LP_ENABLE_SVN=0
 
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT prompt/liquidpromptrc" >> "$HOME/.dot_log"

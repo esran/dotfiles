@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # vim: set ft=sh:
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_alias" >> "$HOME/.dot_log"
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID common/alias" >> "$HOME/.dot_log"
 
 # Ignore MAILER-DAEMON message
 # TODO host specific :(
@@ -30,6 +30,8 @@ PG_BRANCH=${PG_BRANCH:-master}
 JO_BRANCH=${JO_BRANCH:-master}
 alias jocd='cd $HOME/work/JustOne/$JO_BRANCH'
 alias pgcd='cd $HOME/work/PostgreSQL/$PG_BRANCH'
+alias bcd='cd $HOME/work/build/${PWD#*work/}'
+alias mkb='mkdir -p $HOME/work/build/${PWD#*work/}'
 
 # Ninja
 if [[ ! -z $MAX_JOBS && ! -z $MAX_LOAD ]]
@@ -47,7 +49,7 @@ alias l='ls -CF'
 # Always use X tunneling for ssh connections
 alias ssh='ssh -X'
 
-# SSH handy stuff
+# SVN handy stuff
 alias sd='svn diff --diff-cmd ~/bin/diffwrap.sh'
 alias svn_ignore='svn propedit svn:ignore'
 

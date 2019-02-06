@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 # shellcheck disable=1090
 # vim: set ft=zsh:
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  zsh/zsh_rc" >> ~/.dot_log
 
 # Initialise DOTFILES
 [[ -f ~/.dot ]] && source ~/.dot
@@ -10,7 +10,7 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc" >> ~/.dot_log
 
 # Liquidprompt configuration
 # get this in early before we load the plugin
-[[ -f ~/.liquidpromptrc ]] && . ~/.liquidpromptrc
+# [[ -f ~/.liquidpromptrc ]] && . ~/.liquidpromptrc
 
 # reset prompt tag if it is BASH
 if [[ $LP_PS1_PREFIX =~ BASH.* ]]
@@ -30,15 +30,15 @@ source $HOME/.antigen/antigen.zsh
 antigen use oh-my-zsh
 antigen bundle git
 # antigen bundle command-not-found
-antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search
 antigen bundle zsh-users/zsh-completions
 antigen bundle esran/liquidprompt
+antigen bundle zsh-users/zsh-syntax-highlighting
 
 # Antigen Done
 antigen apply
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-plugins" >> ~/.dot_log
+# echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-plugins" >> ~/.dot_log
 
 # oh-my-zsh clobbers LESS :(
 export LESS="-F -X -R"
@@ -69,7 +69,7 @@ then
 	done
 fi
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-functions" >> ~/.dot_log
+# echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-functions" >> ~/.dot_log
 
 # turn of nomatch so that stuff like -? and ^. works
 setopt nonomatch
@@ -81,7 +81,7 @@ then
 	zstyle -e ':completion:*' hosts 'reply=($("$DOTFILES/common/scripts/get-hosts"))'
 fi
 
-echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-hosts" >> ~/.dot_log
+# echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID zsh/zsh_rc post-hosts" >> ~/.dot_log
 
 # Extra processing when inside emacs
 if [[ -n "$INSIDE_EMACS" ]]
@@ -98,12 +98,8 @@ HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000000
 SAVEHIST=10000000
 
-unsetopt INC_APPEND_HISTORY   	 # Don't write history on command start
-unsetopt SHARE_HISTORY           # Don't share between sessions
-
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
 setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY_TIME   # Write to the history file immediately after command
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 setopt HIST_IGNORE_DUPS          # Dont record an entry that was just recorded again.
 setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
@@ -113,6 +109,18 @@ setopt HIST_SAVE_NO_DUPS         # Dont write duplicate entries in the history f
 setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
 setopt HIST_VERIFY               # Dont execute immediately upon history expansion.
 setopt HIST_BEEP                 # Beep when accessing nonexistent history.
+
+case $ZSH_VERSION in
+    5.0.*)
+        setopt INC_APPEND_HISTORY   	 # Write history on command start
+        unsetopt SHARE_HISTORY           # Don't share between sessions
+    ;;
+    *)
+        unsetopt INC_APPEND_HISTORY   	 # Don't write history on command start
+        unsetopt SHARE_HISTORY           # Don't share between sessions
+        setopt INC_APPEND_HISTORY_TIME   # Write to the history file immediately after command
+        ;;
+esac
 
 # FZF
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
@@ -156,3 +164,5 @@ fi
 if [[ -d ~/Stuff/git-hub/share/zsh-completion ]]; then
 	fpath+=(~/Stuff/git-hub/share/zsh-completion)
 fi
+
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT zsh/zsh_rc" >> ~/.dot_log
