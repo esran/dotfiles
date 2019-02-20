@@ -8,7 +8,7 @@ echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID IN  common/profile" >> "$H
 # Initialise DOTFILES
 if test -f "$HOME/.dot"
 then
-	source "$HOME/.dot"
+	. "$HOME/.dot"
 fi
 
 # This gets loaded as the only startup file prior to the gnome-session
@@ -19,19 +19,12 @@ fi
 # rely on checking environment variables as they are retained
 # when the PATH is cleared for stuff like 'tmux' sessions.
 # Do this early as it clobbers LD_LIBRARY_PATH
-if ! which env-check > /dev/null 2>&1
+if ! command -v env-check > /dev/null 2>&1
 then
 	if test -f /etc/justone_profile
 	then
 		echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID source /etc/justone_profile $SHELL" >> ~/.dot_log
-        case $SHELL in
-            *zsh)
-                emulate sh -c 'source /etc/justone_profile'
-                ;;
-            *)
-		        source /etc/justone_profile
-                ;;
-        esac
+		. /etc/justone_profile
 	fi
 fi
 

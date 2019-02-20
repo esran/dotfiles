@@ -28,6 +28,7 @@ fi
 
 # Tweak $HOME to pick up locally mounted rather than NFS mounted
 # if possible.
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot tweak HOME" >> "$HOME/.dot_log"
 if [ "$_ORIG_HOME" = "" ] || [ "$_ORIG_HOME"  = "$HOME" ]
 then
 	if test -d "/home/local/$LOGNAME"
@@ -42,6 +43,7 @@ fi
 
 # Find out true location. Note that this assumes we have actually
 # been installed as ~/.profile!
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot set DOTFILES" >> "$HOME/.dot_log"
 if [ "$DOTFILES" = "" ]
 then
 	if ! DOTFILES=$(readlink ~/.dot)
@@ -63,6 +65,8 @@ export DOTFILES
 #################
 # Path functions.
 #################
+
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot create path functions" >> "$HOME/.dot_log"
 
 # Path add function
 # If there is a second parameter then prepend instead of append
@@ -121,6 +125,7 @@ ldpathadd /usr/local/lib
 
 # Locally installed stuff. Each of these will be placed on the path before the
 # previous elements
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot add various paths" >> "$HOME/.dot_log"
 for _dir in "$_ORIG_HOME" "$_ORIG_HOME/install" ~ ~/install "$HOME/$HOSTNAME/install" ~/.local
 do
 	if test -d "$_dir"
@@ -172,6 +177,7 @@ export PATH LD_LIBRARY_PATH MANPATH
 
 # Setup test directory for PostgreSQL JustOne tests
 # This needs to be a normalised path
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup PGTESTDIR" >> "$HOME/.dot_log"
 PGTESTROOT=$HOME
 # test -d /run/shm && PGTESTROOT=/run/shm/sean
 test ! -d "$PGTESTROOT" && mkdir "$PGTESTROOT"
@@ -200,6 +206,7 @@ export TMPDIR=/tmp/${USER:-$LOGNAME}
 test ! -d "$TMPDIR" && mkdir "$TMPDIR"
 
 # Setup solarized dircolors
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot solarized dircolors" >> "$HOME/.dot_log"
 if test -d "$DOTFILES/externals/dircolors-solarized"
 then
 	if test -f "$DOTFILES/externals/dircolors-solarized/dircolors.ansi-light"
@@ -209,6 +216,7 @@ then
 fi
 
 # Java home
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup JAVA_HOME" >> "$HOME/.dot_log"
 if [ "$JAVA_HOME" = "" ]
 then
 	case $(hostname) in
@@ -222,6 +230,7 @@ then
 fi
 
 # # Perlbrew
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup perlbrew" >> "$HOME/.dot_log"
 if test -d ~/perl5/perlbrew
 then
 	export PERLBREW_ROOT=~/perl5/perlbrew
@@ -235,6 +244,7 @@ then
 fi
 
 # local::lib
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup local::lib" >> "$HOME/.dot_log"
 if test -d "$HOME/perl5/lib/perl5"
 then
 	# shellcheck disable=SC2046
@@ -242,6 +252,7 @@ then
 fi
 
 # STOW
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup stow" >> "$HOME/.dot_log"
 if test -d ~/install/stow
 then
 	export STOW_DIR=~/install/stow
@@ -251,13 +262,15 @@ then
 fi
 
 # RVM
-if ! which rvm > /dev/null 2>&1
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup rvm" >> "$HOME/.dot_log"
+if ! command -v rvm > /dev/null 2>&1
 then
 	test -f "$HOME/.rvm/scripts/rvm" && . "$HOME/.rvm/scripts/rvm"
 fi
 
 # CCACHE
-test -d ~/ccache && export CCACHE_DIR=~/ccache
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup ccache" >> "$HOME/.dot_log"
+test -d "$HOME/ccache" && export CCACHE_DIR="$HOME/ccache"
 test -d "$HOME/$HOSTNAME/ccache" && export CCACHE_DIR=~/$HOSTNAME/ccache
 export CCACHE_NOHASHDIR=1
 
@@ -273,26 +286,30 @@ export LESS="-F -X -R"
 umask 022
 
 # allow core files
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup ulimit core" >> "$HOME/.dot_log"
 ulimit -c unlimited
 
 # neovim
-if which -a nvim > /dev/null 2>&1
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup vim/nvim" >> "$HOME/.dot_log"
+if command -v nvim > /dev/null 2>&1
 then
 	export EDITOR=nvim
-elif which -a vim > /dev/null 2>&1
+elif command -v vim > /dev/null 2>&1
 then
 	export EDITOR=vim
 else
 	export EDITOR=vi
 fi
 
-# emacs
-if test -f ~sean/bin/emacs-multiterm-tramp.sh
-then
-    source ~sean/bin/emacs-multiterm-tramp.sh
-fi
+# # emacs
+# echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup emacs-term" >> "$HOME/.dot_log"
+# if test -f /home/sean/bin/emacs-multiterm-tramp.sh
+# then
+#     . /home/sean/bin/emacs-multiterm-tramp.sh
+# fi
 
 # Python (pyenv)
+echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID     common/dot setup pyenv" >> "$HOME/.dot_log"
 if test -d ~/.pyenv
 then
     export PYENV_ROOT="$HOME/.pyenv"
@@ -308,5 +325,12 @@ fi
 
 # Cargo (rust)
 pathadd "$HOME/.cargo/bin"
+
+# xauth
+if test -f ~/.Xauthority-"$HOSTNAME"
+then
+    XAUTHORITY=~/.Xauthority-"$HOSTNAME"
+    export XAUTHORITY
+fi
 
 echo "$HOSTNAME $(date +"%Y-%m-%d %H:%M:%S") $$ $PPID OUT common/dot" >> "$HOME/.dot_log"
